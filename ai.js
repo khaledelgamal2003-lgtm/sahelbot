@@ -71,7 +71,7 @@ function detectIntent(text = "") {
     }
 
     // =====================
-    // HACIENDA
+    // HACIENDA BAY
     // =====================
 
     if (
@@ -82,6 +82,28 @@ function detectIntent(text = "") {
         text.includes("hacindabay")
     ) {
         return "hacienda_bay";
+    }
+
+    // =====================
+    // HACIENDA White
+    // =====================
+
+        if (
+        text.includes("white") ||
+        text.includes("وايت")
+    ) {
+        return "hacienda_white";
+    }
+
+    // =====================
+    // HACIENDA RED
+    // =====================
+
+        if (
+        text.includes("red") ||
+        text.includes("ريد")
+    ) {
+        return "hacienda_red";
     }
 
     // =====================
@@ -220,6 +242,7 @@ function detectIntent(text = "") {
         text.includes("خدمه العملاء") ||
         text.includes("اكلم حد") ||
         text.includes("تواصل") ||
+        text.includes("التواصل") ||
         text.includes("support") ||
         text.includes("human")
     ) {

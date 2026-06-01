@@ -598,18 +598,24 @@ async function sendJetski(user, sock) {
 
 المكان: New BOBOS Water Sports Spot
 
-💰السعر شامل دخول مارينا:
 15 Min = 1500 EGP
 30 Min = 2500 EGP
 60 Min = 5000 EGP
 
 يتم دفع 500 جنيه جديه حجز ويتم خصمهم من اجمالي السعر عند الوصول
 
-متاح جيت سكي في مراسي صافي بيتش
-اسأل خدمه العملاء عليه او اتصل بينا🔥
 
 0️⃣ القائمة الرئيسية `
     });
+
+
+
+    await sock.sendMessage(user, {
+        text:
+`https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
+    });
+
+
 }
 
 // YACHT FUNC
@@ -617,8 +623,20 @@ async function sendYacht(user, sock) {
 
     await sock.sendMessage(user, {
         text:
-`https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
-    });
+`اسعار تأجيراليخوت🛥️
+
+المكان: New BOBOS Water Sports Spot
+
+الحموله: حتي 7 افراد بالغين
+
+اليخوت تتراوح من 5000 ل 8000 
+جنيه للساعه
+
+يتم دفع 500 جنيه جديه حجز ويتم خصمهم من اجمالي التكلفه
+
+
+0️⃣ القائمة الرئيسية `
+    });    
 
     
     await sock.sendMessage(user, {
@@ -636,12 +654,16 @@ async function sendHotel(user, sock) {
         text:
 `🏨 خدمة حجز الفنادق بأفضل الأسعار ✨
 
-استمتع بإقامة فاخرة في أشهر فنادق الساحل الشمالي ❤️
+استمتع بإقامة فاخرة في أفخم فنادق الساحل الشمالي ❤️
+وبسعر مخفض حصريا لدي شركتنا
 
 متاح الحجز في:
-📍 Rixos Alamein
-📍 Address Beach Resort
-📍 Al Alamein Hotel
+📍 Rixos Premium Alamein
+📍 Address Beach Resort Marassi
+📍 Address Golf Resort Marassi
+📍 Vida Marina Resort Marassi
+📍 Palace Beach Resort Marassi
+📍 Al Alamein Hotel Resort & Spa
 📍 Porto Marina Hotel
 📍 Tolip Resort Sunrays
 📍 Regal Heights Hotel
@@ -666,11 +688,19 @@ async function sendRestaurant(user, sock) {
         text:
 `🍽️ المطاعم المتاحة للحجز:
 
-• Crave Marassi
-• Ovio Marassi
-• Eatery Marassi
+• Crave (Marassi)
+• Ovio (Marassi)
+• Eatery (Marassi)
 • The Lemon Tree & Co.
 • SACHI By The Sea
+• Kiki's (Hacienda White)
+• Boulevard (Seashell)
+• il Nilo (Seashell)
+• Izmir Saray Turkish (Seashell)
+• White & Blue (Ghazala Bay)
+• Aklet Samak  (in front of Marassi)
+• Princess (O mall)
+
 
 📝 برجاء ارسال:
 - اسم المطعم
@@ -720,23 +750,6 @@ async function sendCars(user, sock) {
     });
 }
 
-async function sendAirport(user, sock) {
-
-    bookingRequests[user] = "airport";
-
-    await sock.sendMessage(user, {
-        text:
-`خدمة التوصيل من وإلى مطار العلمين متاحة
-
-برجاء ارسال:
-- عدد الأفراد
-- رقم الرحلة المدون علي التذكره
-- تاريخ الوصول
-- الوجهه
-
-وسيتم التواصل معك ❤️`
-    });
-}
 
 //PRICS
 async function sendPrices(user, sock) {
@@ -806,7 +819,7 @@ ${userNumber}
     });
 }
 
-// MAIN MENY FUNC
+// MAIN MENU FUNC
 
 async function sendMainMenu(user, sock) {
 
@@ -821,8 +834,9 @@ async function sendMainMenu(user, sock) {
 5️⃣ المطاعم
 6️⃣ إيجار السيارات
 7️⃣ توصيل من والي مطار العلمين
+
 8️⃣ السياسات والشروط
-9️⃣ سيب ملحوظة`
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء`
     });
 }
 
@@ -846,25 +860,13 @@ async function sendGreeting(user, sock) {
 💳 للدفع اكتب:
 دفع
 
-👨‍💼 للتحدث مع خدمة العملاء اكتب:
-خدمة عملاء
+👨‍💼 للتواصل مع خدمة العملاء اكتب:
+تواصل
 
-📋 لو عايز القوائم المرقمة اكتب:
+📋 لو عايز القائمة الرئيسية اكتب:
 قائمة`
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -930,13 +932,13 @@ if (intent === "marina") {
         text:
 `📍 سعر QR مارينا
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 🚗 300 جنيه للعربية
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 🚗 400 جنيه للعربية
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 
@@ -953,33 +955,33 @@ if (intent === "marassi") {
 
 • مراسي مارينا ✨:
 
-Instapay or Vodafone Cash:
-700 جنيه للعربية 🚗
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للعربية 🚗
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 1000 جنيه للعربيه 🚗
 
 -------------------------
 
 • مراسي بلانكا 🏝️:
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 2500 جنيه للعربيه 🚗
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 3000 جنيه للعربيه 🚗
 
 -------------------------
 
 • نورث بيتش 🏖️:
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 1000 جنيه للفرد
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 1250 جنيه للفرد
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 
@@ -993,18 +995,18 @@ if (intent === "amwaj") {
 `📍 سعر QR أمواج
 -------------------------
 
-Instapay or Vodafone Cash:
-700 جنيه للفرد
-
-دفع نقدي عند الوصول:
+Instapay or Vodafone Cash قبل الدخول:
 800 جنيه للفرد
+
+دفع عند الوصول:
+1100 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 
@@ -1018,18 +1020,18 @@ if (intent === "seashell") {
 `📍 سعر QR سيشيل
 -------------------------
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
-دفع نقدي عند الوصول:
-1600 جنيه للفرد
+دفع عند الوصول:
+1800 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 
@@ -1043,18 +1045,18 @@ if (intent === "hacienda_bay") {
 `📍 سعر QR هاسيندا باي
 -------------------------
 
-Instapay or Vodafone Cash:
-700 جنيه للفرد
-
-دفع نقدي عند الوصول:
+Instapay or Vodafone Cash قبل الدخول:
 800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 
@@ -1068,23 +1070,51 @@ if (intent === "hacienda_white") {
 `📍 سعر QR هاسيندا وايت
 -------------------------
 
-Instapay or Vodafone Cash:
-1000 جنيه للفرد
+Instapay or Vodafone Cash قبل الدخول:
+1200 جنيه للفرد
 
-دفع نقدي عند الوصول:
-1250 جنيه للفرد
+دفع عند الوصول:
+1400 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 
     return;
 }
+
+
+if (intent === "hacienda_red") {
+
+    await sock.sendMessage(user, {
+        text:
+`📍 سعر QR هاسيندا ريد
+-------------------------
+
+Instapay or Vodafone Cash قبل الدخول:
+1200 جنيه للفرد
+
+دفع عند الوصول:
+1400 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول
+
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
 
 if (intent === "mountain_view") {
 
@@ -1184,8 +1214,8 @@ if (!userState[user]) {
 
 كل الي عليك ابعت رقم 1 او 2 بالانجليزي
 
-1️⃣ لمعرفه الاسعار والتفاصيل
-2️⃣ لمتابعه الطلب او الشكاوي`
+1️⃣ لو لسه عايز تعرف الأسعار والتفاصيل
+2️⃣ لو عايز تكلم خدمة العملاء وتحجز`
     });
 
     return;
@@ -1404,7 +1434,7 @@ if (state.step === "main_menu") {
 6️⃣ هاسيندا وايت
 7️⃣ ماونتن ڤيو رأس الحكمة
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ رجوع`
         });
 
@@ -1523,13 +1553,13 @@ if (state.step === "qr") {
             text:
 `📍 سعر QR مارينا
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 🚗 300 جنيه للعربية
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 🚗 400 جنيه للعربية
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
         });
         return;
@@ -1545,33 +1575,33 @@ Instapay or Vodafone Cash:
 
 • مراسي مارينا ✨:
 
-Instapay or Vodafone Cash:
-700 جنيه للعربية 🚗
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للعربية 🚗
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 1000 جنيه للعربيه 🚗
 
 -------------------------
 
 • مراسي بلانكا 🏝️:
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 2500 جنيه للعربيه 🚗
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 3000 جنيه للعربيه 🚗
 
 -------------------------
 
 • نورث بيتش 🏖️:
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 1000 جنيه للفرد
 
-دفع نقدي عند الوصول:
+دفع عند الوصول:
 1250 جنيه للفرد
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
         });
         return;
@@ -1585,18 +1615,18 @@ Instapay or Vodafone Cash:
 `📍 سعر QR أمواج
 -------------------------
 
-Instapay or Vodafone Cash:
-700 جنيه للفرد
-
-دفع نقدي عند الوصول:
+Instapay or Vodafone Cash قبل الدخول:
 800 جنيه للفرد
+
+دفع عند الوصول:
+1100 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
         });
         return;
@@ -1610,18 +1640,18 @@ Instapay or Vodafone Cash:
 `📍 سعر QR سيشيل
 -------------------------
 
-Instapay or Vodafone Cash:
+Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
-دفع نقدي عند الوصول:
-1600 جنيه للفرد
+دفع عند الوصول:
+1800 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
         });
         return;
@@ -1635,18 +1665,18 @@ Instapay or Vodafone Cash:
 `📍 سعر QR هاسيندا باي
 -------------------------
 
-Instapay or Vodafone Cash:
-700 جنيه للفرد
-
-دفع نقدي عند الوصول:
+Instapay or Vodafone Cash قبل الدخول:
 800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
         });
         return;
@@ -1660,18 +1690,18 @@ Instapay or Vodafone Cash:
 `📍 سعر QR هاسيندا وايت
 -------------------------
 
-Instapay or Vodafone Cash:
-1000 جنيه للفرد
+Instapay or Vodafone Cash قبل الدخول:
+1200 جنيه للفرد
 
-دفع نقدي عند الوصول:
-1250 جنيه للفرد
+دفع عند الوصول:
+1400 جنيه للفرد
 
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
 🏊 البول
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
         });
         return;
@@ -1719,7 +1749,7 @@ else if (clean === "9") {
 6️⃣ هاسيندا وايت
 7️⃣ ماونتن ڤيو رأس الحكمة
 
-9️⃣ الدفع
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ رجوع`
         });
 
