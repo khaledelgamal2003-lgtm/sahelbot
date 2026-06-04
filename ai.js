@@ -263,6 +263,62 @@ function detectIntent(text = "") {
         return "greeting";
     }
 */
+
+//-------------------------------------beaches-------------------------
+
+
+    if (
+        text.includes("karl") ||
+        text.includes("كارل") ||
+        text.includes("كرل") ||
+        text.includes("karll")
+    ) {
+        return "karl";
+    }
+
+    
+    if (
+        text.includes("notch") ||
+        text.includes("notchh") ||
+        text.includes("نوتش") ||
+        text.includes("نوتشش")
+    ) {
+        return "notch";
+    }
+
+    /*
+    if (
+        text.includes("عربية") ||
+        text.includes("عربيات") ||
+        text.includes("car") ||
+        text.includes("سياره") ||
+        text.includes("سيارة") ||
+        text.includes("سيارات") ||
+        text.includes("cars")
+    ) {
+        return "cars";
+    }
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return null;
 }
 

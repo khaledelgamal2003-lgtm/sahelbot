@@ -869,6 +869,65 @@ async function sendGreeting(user, sock) {
 }
 
 
+//------beaches-------
+
+
+async function sendkarl(user, sock) {
+
+
+    await sock.sendMessage(user, {
+        text:
+`حجوزات شاطئ كارل بيتش
+مدينه العلمين الجديده`
+    });
+
+
+await sock.sendMessage(user, {
+    image: { url: "Beaches/KARL/KARL.jpg" },
+    caption: "Price list"
+});
+
+await sock.sendMessage(user, {
+    image: { url: "Beaches/KARL/karl_regular.jpg" },
+    caption: "Regular Seated Beach and Pool"
+});
+
+await sock.sendMessage(user, {
+    image: { url: "Beaches/KARL/karl_sunbed.jpg" },
+    caption: "Sun Beds"
+});
+
+await sock.sendMessage(user, {
+    image: { url: "Beaches/KARL/karl_pergola_1.jpg" },
+    caption: "VIP Seats Pergola First Row"
+});
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1200,6 +1259,32 @@ if (intent === "support") {
 
     return;
 }
+
+//--------beaches----------
+
+if (intent === "karl") {
+    await sendkarl(user, sock);
+    return;
+}
+
+if (intent === "notch") {
+    await sendnotch(user, sock);
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // =========================
 // FIRST MESSAGE
 // =========================
