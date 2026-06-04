@@ -153,6 +153,16 @@ const waitingNote = {};
         const msg = messages[0];
         if (!msg.message) return;
 
+        // تجاهل الرسائل القديمة
+        if (!msg.messageTimestamp) return;
+
+        if (
+            msg.key.id?.startsWith("BAE5") ||
+            msg.key.id?.startsWith("3EB0")
+        ) {
+            return;
+        }
+
         const user = ( msg.key.remoteJidAlt ||
             msg.key.participant ||
             msg.key.remoteJid
@@ -197,6 +207,20 @@ if (msg.key.fromMe) return;
 
         text = text.trim();
         const intent = detectIntent(text);
+
+
+
+        text = text
+    .replace(/٠/g, "0")
+    .replace(/١/g, "1")
+    .replace(/٢/g, "2")
+    .replace(/٣/g, "3")
+    .replace(/٤/g, "4")
+    .replace(/٥/g, "5")
+    .replace(/٦/g, "6")
+    .replace(/٧/g, "7")
+    .replace(/٨/g, "8")
+    .replace(/٩/g, "9");
 
         const clean = text.replace(/[^0-9]/g, "");
 
@@ -871,7 +895,7 @@ async function sendGreeting(user, sock) {
 
 //------beaches-------
 
-
+//KARL
 async function sendkarl(user, sock) {
 
 
@@ -1300,7 +1324,7 @@ if (!userState[user]) {
 كل الي عليك ابعت رقم 1 او 2 بالانجليزي
 
 1️⃣ لو لسه عايز تعرف الأسعار والتفاصيل
-2️⃣ لو عايز تكلم خدمة العملاء وتحجز`
+2️⃣  لو عايز تكلم خدمة العملاء وتحجز`
     });
 
     return;
@@ -1457,11 +1481,23 @@ ${userNumber}`
         return;
     }
 
-    else{
-                await sock.sendMessage(user, {
-            text:
-`برجاء كتابه 1 او 2 بالانجليزيه`
-        });
+    else if (clean === "9") {
+        await handlePayment(user, userNumber, sock);
+        return;
+    }
+
+
+    else if (clean === "0") {
+        userState[user] = {step: "main_menu" };
+        await sendMainMenu(user, sock);
+        return;
+    }
+
+
+    else if (clean === "1") {
+        userState[user] = {step: "main_menu" };
+        await sendMainMenu(user, sock);
+        return;
     }
 
     return;

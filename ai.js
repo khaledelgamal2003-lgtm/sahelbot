@@ -24,6 +24,7 @@ function detectIntent(text = "") {
         text.includes("مراسي") ||
         text.includes("المراسي") ||
         text.includes("مراسى") ||
+        text.includes("لمراسي") ||
         text.includes("لمراسى") ||
         text.includes("marassi") ||
         text.includes("marrasi") ||
@@ -129,6 +130,10 @@ function detectIntent(text = "") {
         text.includes("الجيتسكي") ||
         text.includes("جيت سكي") ||
         text.includes("الجيت سكي") ||
+        text.includes("جيتسكى") ||
+        text.includes("الجيتسكى") ||
+        text.includes("جيت سكى") ||
+        text.includes("الجيت سكى") ||
         text.includes("jetski") ||
         text.includes("jet ski")
     ) {
@@ -143,9 +148,12 @@ function detectIntent(text = "") {
         text.includes("يخت") ||
         text.includes("اليخت") ||
         text.includes("اليخوت") ||
+        text.includes("ليخت") ||
+        text.includes("ليخوت") ||
         text.includes("يخوت") ||
         text.includes("yacht") ||
         text.includes("boat")
+        
     ) {
         return "yacht";
     }
@@ -157,6 +165,8 @@ function detectIntent(text = "") {
     if (
         text.includes("فندق") ||
         text.includes("فنادق") ||
+        text.includes("لفندق") ||
+        text.includes("لفنادق") ||
         text.includes("hotel") ||
         text.includes("hotels")
     ) {
@@ -170,6 +180,8 @@ function detectIntent(text = "") {
     if (
         text.includes("مطعم") ||
         text.includes("مطاعم") ||
+        text.includes("لمطعم") ||
+        text.includes("لمطاعم") ||
         text.includes("restaurant") ||
         text.includes("food")
     ) {
@@ -182,6 +194,7 @@ function detectIntent(text = "") {
 
     if (
         text.includes("عربية") ||
+        text.includes("عربيه") ||
         text.includes("عربيات") ||
         text.includes("car") ||
         text.includes("سياره") ||
@@ -209,10 +222,7 @@ function detectIntent(text = "") {
     // =====================
 
     if (
-        text.includes("ادفع") ||
         text.includes("دفع") ||
-        text.includes("احاسب") ||
-        text.includes("payment") ||
         text.includes("pay")
     ) {
         return "payment";
@@ -225,6 +235,9 @@ function detectIntent(text = "") {
     if (
         text.includes("سعر") ||
         text.includes("اسعار") ||
+        text.includes("أسعار") ||
+        text.includes("الاسعار") ||
+        text.includes("الأسعار") ||
         text.includes("بكام") ||
         text.includes("كام") ||
         text.includes("price") ||
@@ -271,6 +284,8 @@ function detectIntent(text = "") {
         text.includes("karl") ||
         text.includes("كارل") ||
         text.includes("كرل") ||
+        text.includes("لكارل") ||
+        text.includes("لكرل") ||
         text.includes("karll")
     ) {
         return "karl";
@@ -281,7 +296,9 @@ function detectIntent(text = "") {
         text.includes("notch") ||
         text.includes("notchh") ||
         text.includes("نوتش") ||
-        text.includes("نوتشش")
+        text.includes("نوتشش") ||
+        text.includes("لنوتش") ||
+        text.includes("لنوتشش")
     ) {
         return "notch";
     }
