@@ -858,7 +858,7 @@ async function sendMainMenu(user, sock) {
 
 1️⃣ اسعار QR
 2️⃣ الجيتسكي واليخوت
-3️⃣ الشاليهات والفيلات
+3️⃣ حجز الشواطئ الخاصة
 4️⃣ الفنادق
 5️⃣ المطاعم
 6️⃣ إيجار السيارات
@@ -1507,24 +1507,27 @@ if (state.step === "main_menu") {
         return;
     }
 
-    // جيتسكي ويخوت
+    // الجيتسكي واليخوت
     else if (clean === "2") {
         await sendJetski(user, sock);
+        await sendYacht(user, sock);
         return;
     }
 
-    // الشاليهات والفيلات
+    // حجز الشواطئ
     else if (clean === "3") {
+        state.step = "beach";
 
         await sock.sendMessage(user, {
             text:
-`🏡 لحجز شاليه أو فيلا
+`الشواطئ المتاحه للحجز
 
-برجاء الانتظار حتي يتم التواصل معك من خدمة العملاء`
+1️⃣ KARL beach new alamein
+
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ رجوع`
         });
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+
         return;
     }
 
@@ -1591,19 +1594,11 @@ if (state.step === "main_menu") {
 
 
     // Leave Note
-else if (clean === "9") {
+    else if (clean === "9") {
 
-    waitingNote[user] = true;
-
-    await sock.sendMessage(user, {
-        text:
-`📝 سيب ملحوظتك
-
-ابعت رسالتك وهتوصل لخدمة العملاء ❤️`
-    });
-
-    return;
-}
+        await handlePayment(user, sock);
+        return;
+    }
 //----------------
 
     else {
@@ -1830,7 +1825,39 @@ else if (clean === "9") {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+// =========================
+// BEACH MENU 
+// =========================
+
+if (state.step === "beach") {
+
+    // KARL
+    if (clean === "1") {
+        await sendkarl(user, sock);
+        return;
+    }
+}
    
+
+
+
+
+
+
+
+
+
+
 
     });
 
