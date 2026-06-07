@@ -206,15 +206,22 @@ function detectIntent(text = "") {
     }
 
     // =====================
-    // AIRPORT
+    // PARTY
     // =====================
 
     if (
-        text.includes("مطار") ||
-        text.includes("airport") ||
-        text.includes("توصيل")
+        text.includes("حفله") ||
+        text.includes("حفل") ||
+        text.includes("حفلة") ||
+        text.includes("حفلات") ||
+        text.includes("الحفله") ||
+        text.includes("الحفلة") ||
+        text.includes("الحفل") ||
+        text.includes("party") ||
+        text.includes("parties") ||
+        text.includes("الحفلات")
     ) {
-        return "airport";
+        return "party";
     }
 
     // =====================
@@ -293,14 +300,14 @@ function detectIntent(text = "") {
 
     
     if (
-        text.includes("notch") ||
-        text.includes("notchh") ||
-        text.includes("نوتش") ||
-        text.includes("نوتشش") ||
-        text.includes("لنوتش") ||
-        text.includes("لنوتشش")
+        text.includes("noya") ||
+        text.includes("noia") ||
+        text.includes("noyaa") ||
+        text.includes("تويا") ||
+        text.includes("نويا") ||
+        text.includes("لنويا")
     ) {
-        return "notch";
+        return "noya";
     }
 
     /*

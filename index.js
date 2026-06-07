@@ -595,8 +595,8 @@ async function sendQR(user, sock) {
 ابعت اسم المكان مباشرة ❤️`
     });
 }
-
-//jetskii
+/*
+//JETSKI FUNC
 async function sendJetski(user, sock) {
 
     await sock.sendMessage(user, {
@@ -624,47 +624,33 @@ async function sendJetski(user, sock) {
 
 
 }
-
-// YACHT FUNC
-async function sendYacht(user, sock) {
+*/
+// YACHT JETSKI BOBOS FUNC
+async function sendBobos(user, sock) {
 
     await sock.sendMessage(user, {
         text:
-`اسعار تأجيراليخوت🛥️
+`تأجير اليخوت والجيتسكي🛥️
 
 المكان: New BOBOS Water Sports Spot
-
-الحموله: حتي 12 فرد
-اقل مده تأجير: ساعة
-الساعة: 6000 جنيه
 
 يتم دفع 500 جنيه جديه حجز ويتم خصمهم من اجمالي التكلفه`
     });    
 
-    
+        await sock.sendMessage(user, {
+    document: {
+        url: "BOBOS/BOBOS.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "BOBOS.pdf"
+    });
+
+
+
+
     await sock.sendMessage(user, {
         text:
 `https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht1.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht2.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht3.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht4.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht5.jpeg" },
     });
 
     await sock.sendMessage(user, {
@@ -674,7 +660,26 @@ async function sendYacht(user, sock) {
         });    
 }
 
-//hotelsss
+
+
+
+//BEACH FUNC
+async function sendbeach(user, sock) {
+
+await sock.sendMessage(user, {
+            text:
+`الشواطئ المتاحه للحجز
+
+1️⃣ KARL beach new alamein
+2️⃣ NOYA beach new alamein
+
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ رجوع`
+        });
+
+}
+
+//HOTEL FUNC
 async function sendHotel(user, sock) {
 
     bookingRequests[user] = "hotel";
@@ -709,6 +714,7 @@ async function sendHotel(user, sock) {
     });
 }
 
+//RESTUARANT FUNC
 async function sendRestaurant(user, sock) {
 
     bookingRequests[user] = "restaurant";
@@ -739,6 +745,8 @@ async function sendRestaurant(user, sock) {
     });
 }
 
+
+//CARS FUNC
 async function sendCars(user, sock) {
 
     bookingRequests[user] = "cars";
@@ -780,7 +788,31 @@ async function sendCars(user, sock) {
 }
 
 
-//PRICS
+//PARTY FUNC
+async function sendParty(user, sock) {
+
+    bookingRequests[user] = "party";
+
+    await sock.sendMessage(user, {
+    document: {
+        url: "Party/PARTY.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "PARTY.pdf"
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`يرجاء الاطلاع علي الملف المرفق 
+ثم اختيار:
+الحفلة وعدد التذاكر
+مع ايضاح اي تفاصيل او ملاحظات 
+وسيقوم أحد ممثلي خدمة العملاء بالرد عليكم❤️`
+    });
+}
+
+
+//PRICE FUNC
 async function sendPrices(user, sock) {
 
     await sock.sendMessage(user, {
@@ -796,27 +828,6 @@ async function sendPrices(user, sock) {
 او ابعت رقم 0 للقائمه الرئيسيه`
     });
 }
-
-// AIRPLANE FUNC
-async function sendAirport(user, sock) {
-
-    bookingRequests[user] = "airport";
-
-    await sock.sendMessage(user, {
-        text:
-`خدمة التوصيل من وإلى مطار العلمين متاحة
-
-برجاء ارسال:
-- عدد الأفراد
-- رقم الرحلة المدون علي التذكره
-- تاريخ الوصول
-- الوجهه
-
-وسيتم التواصل معك ❤️`
-    });
-}
-
-
 
 
 // PAYMENT FUNC
@@ -837,6 +848,13 @@ ${userNumber}
 
 📍 العميل جاهز للدفع`
     });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/instructions.jpg" },
+        caption:"تعليمات استخدام ال QR"
+    });
+
 
     await sock.sendMessage(user, {
         text:
@@ -861,41 +879,14 @@ async function sendMainMenu(user, sock) {
 3️⃣ حجز الشواطئ الخاصة
 4️⃣ الفنادق
 5️⃣ المطاعم
-6️⃣ إيجار السيارات
-7️⃣ توصيل من والي مطار العلمين
+6️⃣ الحفلات والسهرات
+7️⃣ تأجير السيارات
 
 8️⃣ السياسات والشروط
 9️⃣ للحجز وتحويل المحادثه لخدمة العملاء`
     });
 }
 
-
-//   greeting FUNC
-async function sendGreeting(user, sock) {
-
-    await sock.sendMessage(user, {
-        text:
-`👋 أهلاً بيك في SahelJobss ❤️
-
-نقدر نساعدك في:
-
-🏖️ QR
-🛥️ جيتسكي ويخوت
-🏨 فنادق
-🍽️ مطاعم
-🚗 تأجير سيارات
-✈️ توصيل للمطار
-
-💳 للدفع اكتب:
-دفع
-
-👨‍💼 للتواصل مع خدمة العملاء اكتب:
-تواصل
-
-📋 لو عايز القائمة الرئيسية اكتب:
-قائمة`
-    });
-}
 
 
 //------beaches------------------------------------------------
@@ -909,26 +900,13 @@ async function sendkarl(user, sock) {
 مدينه العلمين الجديده`
     });
 
-
-await sock.sendMessage(user, {
-    image: { url: "Beaches/KARL/KARL.jpg" },
-    caption: "Price list"
-});
-
-await sock.sendMessage(user, {
-    image: { url: "Beaches/KARL/karl_regular.jpg" },
-    caption: "Regular Seated Beach and Pool"
-});
-
-await sock.sendMessage(user, {
-    image: { url: "Beaches/KARL/karl_sunbed.jpg" },
-    caption: "Sun Beds"
-});
-
-await sock.sendMessage(user, {
-    image: { url: "Beaches/KARL/karl_pergola_1.jpg" },
-    caption: "VIP Seats Pergola First Row"
-});
+    await sock.sendMessage(user, {
+    document: {
+        url: "Beaches/KARL/KARL.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "KARL.pdf"
+    });
 
     await sock.sendMessage(user, {
         text:
@@ -938,6 +916,31 @@ await sock.sendMessage(user, {
 }
 
 
+
+
+//NOYA
+async function sendnoya(user, sock) {
+
+    await sock.sendMessage(user, {
+        text:
+`حجوزات شاطئ نويا بيتش
+مدينه العلمين الجديده`
+    });
+
+await sock.sendMessage(user, {
+    document: {
+        url: "Beaches/NOYA/NOYA.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "NOYA.pdf"
+});
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+}
 
 
 
@@ -1207,11 +1210,6 @@ if (intent === "payment") {
     return;
 }
 
-if (intent === "yacht") {
-    await sendYacht(user, sock);
-    return;
-}
-
 if (intent === "restaurant") {
     await sendRestaurant(user, sock);
     return;
@@ -1222,10 +1220,6 @@ if (intent === "cars") {
     return;
 }
 
-if (intent === "airport") {
-    await sendAirport(user, sock);
-    return;
-}
 
 if (intent === "prices") {
     await sock.sendMessage(user, {
@@ -1241,13 +1235,18 @@ if (intent === "prices") {
     return;
 }
 
-if (intent === "greeting") {
-    await sendGreeting(user, sock);
+if (intent === "jetski") {
+    await sendBobos(user, sock);
     return;
 }
 
-if (intent === "jetski") {
-    await sendJetski(user, sock);
+if (intent === "yacht") {
+    await sendBobos(user, sock);
+    return;
+}
+
+if (intent === "party") {
+    await sendParty(user, sock);
     return;
 }
 
@@ -1281,8 +1280,10 @@ if (intent === "karl") {
     return;
 }
 
-if (intent === "notch") {
-    await sendnotch(user, sock);
+
+
+if (intent === "noya") {
+    await sendnoya(user, sock);
     return;
 }
 
@@ -1309,6 +1310,10 @@ if (intent === "notch") {
 if (!userState[user]) {
 
     userState[user] = { step: "bot_mode" };
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/WELCOME.jpg" },
+    });
 
     await sock.sendMessage(user, {
         text:
@@ -1509,25 +1514,14 @@ if (state.step === "main_menu") {
 
     // الجيتسكي واليخوت
     else if (clean === "2") {
-        await sendJetski(user, sock);
-        await sendYacht(user, sock);
+        await sendBobos(user, sock);
         return;
     }
 
     // حجز الشواطئ
     else if (clean === "3") {
         state.step = "beach";
-
-        await sock.sendMessage(user, {
-            text:
-`الشواطئ المتاحه للحجز
-
-1️⃣ KARL beach new alamein
-
-9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
-0️⃣ رجوع`
-        });
-
+        await sendbeach(user, sock);
         return;
     }
 
@@ -1543,15 +1537,15 @@ if (state.step === "main_menu") {
         return;
     }
 
-    // تأجير سيارات
+    // الحفلات
     else if (clean === "6") {
-        await sendCars(user, sock);
+        await sendParty(user, sock);
         return;
     }
 
-    // المطار
+    // تأجير سيارات
     else if (clean === "7") {
-    await sendAirport(user, sock);
+    await sendcars(user, sock);
         return;
     }
 
@@ -1788,11 +1782,11 @@ Instapay or Vodafone Cash قبل الدخول:
         return;
     }
 
-// Payment
-else if (clean === "9") {
+    // Payment
+    else if (clean === "9") {
     await handlePayment(user, userNumber, sock);
     return;
-}
+    }
 
     // رجوع
     else if (clean === "0") {
@@ -1844,6 +1838,26 @@ if (state.step === "beach") {
     // KARL
     if (clean === "1") {
         await sendkarl(user, sock);
+        return;
+    }
+
+
+    if (clean === "2") {
+        await sendnoya(user, sock);
+        return;
+    }
+
+    // Payment
+    else if (clean === "9") {
+    await handlePayment(user, userNumber, sock);
+    return;
+    }
+
+    // رجوع
+    else if (clean === "0") {
+
+        state.step = "main_menu";
+        await sendMainMenu(user, sock);
         return;
     }
 }
