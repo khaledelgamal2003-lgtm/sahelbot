@@ -595,8 +595,8 @@ async function sendQR(user, sock) {
 ابعت اسم المكان مباشرة ❤️`
     });
 }
-
-//jetskii
+/*
+//JETSKI FUNC
 async function sendJetski(user, sock) {
 
     await sock.sendMessage(user, {
@@ -624,47 +624,33 @@ async function sendJetski(user, sock) {
 
 
 }
-
-// YACHT FUNC
-async function sendYacht(user, sock) {
+*/
+// YACHT JETSKI BOBOS FUNC
+async function sendBobos(user, sock) {
 
     await sock.sendMessage(user, {
         text:
-`اسعار تأجيراليخوت🛥️
+`تأجير اليخوت والجيتسكي🛥️
 
 المكان: New BOBOS Water Sports Spot
-
-الحموله: حتي 12 فرد
-اقل مده تأجير: ساعة
-الساعة: 6000 جنيه
 
 يتم دفع 500 جنيه جديه حجز ويتم خصمهم من اجمالي التكلفه`
     });    
 
-    
+        await sock.sendMessage(user, {
+    document: {
+        url: "BOBOS/BOBOS.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "BOBOS.pdf"
+    });
+
+
+
+
     await sock.sendMessage(user, {
         text:
 `https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht1.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht2.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht3.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht4.jpeg" },
-    });
-
-    await sock.sendMessage(user, {
-        image: { url: "BOBOS/yacht5.jpeg" },
     });
 
     await sock.sendMessage(user, {
@@ -677,7 +663,7 @@ async function sendYacht(user, sock) {
 
 
 
-//jetskii
+//BEACH FUNC
 async function sendbeach(user, sock) {
 
 await sock.sendMessage(user, {
@@ -693,7 +679,7 @@ await sock.sendMessage(user, {
 
 }
 
-//hotelsss
+//HOTEL FUNC
 async function sendHotel(user, sock) {
 
     bookingRequests[user] = "hotel";
@@ -728,6 +714,7 @@ async function sendHotel(user, sock) {
     });
 }
 
+//RESTUARANT FUNC
 async function sendRestaurant(user, sock) {
 
     bookingRequests[user] = "restaurant";
@@ -758,6 +745,8 @@ async function sendRestaurant(user, sock) {
     });
 }
 
+
+//CARS FUNC
 async function sendCars(user, sock) {
 
     bookingRequests[user] = "cars";
@@ -799,7 +788,31 @@ async function sendCars(user, sock) {
 }
 
 
-//PRICS
+//PARTY FUNC
+async function sendParty(user, sock) {
+
+    bookingRequests[user] = "party";
+
+    await sock.sendMessage(user, {
+    document: {
+        url: "Party/PARTY.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "PARTY.pdf"
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`يرجاء الاطلاع علي الملف المرفق 
+ثم اختيار:
+الحفلة وعدد التذاكر
+مع ايضاح اي تفاصيل او ملاحظات 
+وسيقوم أحد ممثلي خدمة العملاء بالرد عليكم❤️`
+    });
+}
+
+
+//PRICE FUNC
 async function sendPrices(user, sock) {
 
     await sock.sendMessage(user, {
@@ -815,27 +828,6 @@ async function sendPrices(user, sock) {
 او ابعت رقم 0 للقائمه الرئيسيه`
     });
 }
-
-// AIRPLANE FUNC
-async function sendAirport(user, sock) {
-
-    bookingRequests[user] = "airport";
-
-    await sock.sendMessage(user, {
-        text:
-`خدمة التوصيل من وإلى مطار العلمين متاحة
-
-برجاء ارسال:
-- عدد الأفراد
-- رقم الرحلة المدون علي التذكره
-- تاريخ الوصول
-- الوجهه
-
-وسيتم التواصل معك ❤️`
-    });
-}
-
-
 
 
 // PAYMENT FUNC
@@ -856,6 +848,13 @@ ${userNumber}
 
 📍 العميل جاهز للدفع`
     });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/instructions.jpg" },
+        caption:"تعليمات استخدام ال QR"
+    });
+
 
     await sock.sendMessage(user, {
         text:
@@ -880,8 +879,8 @@ async function sendMainMenu(user, sock) {
 3️⃣ حجز الشواطئ الخاصة
 4️⃣ الفنادق
 5️⃣ المطاعم
-6️⃣ إيجار السيارات
-7️⃣ توصيل من والي مطار العلمين
+6️⃣ الحفلات والسهرات
+7️⃣ تأجير السيارات
 
 8️⃣ السياسات والشروط
 9️⃣ للحجز وتحويل المحادثه لخدمة العملاء`
@@ -1211,11 +1210,6 @@ if (intent === "payment") {
     return;
 }
 
-if (intent === "yacht") {
-    await sendYacht(user, sock);
-    return;
-}
-
 if (intent === "restaurant") {
     await sendRestaurant(user, sock);
     return;
@@ -1226,10 +1220,6 @@ if (intent === "cars") {
     return;
 }
 
-if (intent === "airport") {
-    await sendAirport(user, sock);
-    return;
-}
 
 if (intent === "prices") {
     await sock.sendMessage(user, {
@@ -1245,9 +1235,18 @@ if (intent === "prices") {
     return;
 }
 
-
 if (intent === "jetski") {
-    await sendJetski(user, sock);
+    await sendBobos(user, sock);
+    return;
+}
+
+if (intent === "yacht") {
+    await sendBobos(user, sock);
+    return;
+}
+
+if (intent === "party") {
+    await sendParty(user, sock);
     return;
 }
 
@@ -1311,6 +1310,10 @@ if (intent === "noya") {
 if (!userState[user]) {
 
     userState[user] = { step: "bot_mode" };
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/WELCOME.jpg" },
+    });
 
     await sock.sendMessage(user, {
         text:
@@ -1511,8 +1514,7 @@ if (state.step === "main_menu") {
 
     // الجيتسكي واليخوت
     else if (clean === "2") {
-        await sendJetski(user, sock);
-        await sendYacht(user, sock);
+        await sendBobos(user, sock);
         return;
     }
 
@@ -1535,15 +1537,15 @@ if (state.step === "main_menu") {
         return;
     }
 
-    // تأجير سيارات
+    // الحفلات
     else if (clean === "6") {
-        await sendCars(user, sock);
+        await sendParty(user, sock);
         return;
     }
 
-    // المطار
+    // تأجير سيارات
     else if (clean === "7") {
-    await sendAirport(user, sock);
+    await sendcars(user, sock);
         return;
     }
 
