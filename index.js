@@ -595,36 +595,7 @@ async function sendQR(user, sock) {
 ابعت اسم المكان مباشرة ❤️`
     });
 }
-/*
-//JETSKI FUNC
-async function sendJetski(user, sock) {
 
-    await sock.sendMessage(user, {
-        text:
-`الجيتسكي في مارينا🛥️
-
-المكان: New BOBOS Water Sports Spot
-
-15 Min = 1500 EGP
-30 Min = 2500 EGP
-60 Min = 5000 EGP
-
-يتم دفع 500 جنيه جديه حجز ويتم خصمهم من اجمالي السعر عند الوصول
-
-
-0️⃣ القائمة الرئيسية `
-    });
-
-
-
-    await sock.sendMessage(user, {
-        text:
-`https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
-    });
-
-
-}
-*/
 // YACHT JETSKI BOBOS FUNC
 async function sendBobos(user, sock) {
 
@@ -855,14 +826,24 @@ ${userNumber}
         caption:"تعليمات استخدام ال QR"
     });
 
-
     await sock.sendMessage(user, {
         text:
 `✅ تم تحويل طلبك لخدمة العملاء
 
-برجاء انتظار التواصل معك ❤️
+برجاء انتظار التواصل معك ❤️`
+    });
 
-0️⃣ القائمة الرئيسية`
+    await sock.sendMessage(user, {
+        text:
+`طرق الدفع:
+-في حاله طلب خدمه دفع قبل الدخول
+Instapay: 01000992177
+Vodafone Cash: 01055855696
+
+-في حاله طلب خدمه دفع عند الوصول
+يتم التواصل معنا قبل الوصول ب 30 دقيقه وسيكون في انتظارك احد افراد طاقم العمل علي البوابات لإتمام عمليه الدخول والدفع
+
+0️⃣ للقائمة الرئيسية`
     });
 }
 
@@ -1033,21 +1014,21 @@ if (intent === "marassi") {
         caption: `مراسي مارينا ✨:
 
 Instapay or Vodafone Cash قبل الدخول:
-900 جنيه للعربية 🚗
+1000 جنيه للعربية 🚗
 
 دفع عند الوصول:
-1200 جنيه للعربيه 🚗`
+1400 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
         image: { url: "QR/Marassi/north1.jpeg" },
-        caption: `• نورث بيتش 🏖️:
+        caption: `نورث بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-1000 جنيه للفرد
+1200 جنيه للفرد
 
 دفع عند الوصول:
-1300 جنيه للفرد
+1500 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1056,7 +1037,7 @@ note:
 
     await sock.sendMessage(user, {
         image: { url: "QR/Marassi/blancalagoon.jpeg" },
-        caption: `• مراسي بلانكا 🏝️:
+        caption: `مراسي بلانكا 🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
 2500 جنيه للعربيه 🚗
@@ -1073,10 +1054,40 @@ note:
         caption: `حمامات سباحه المارينا  🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
-500 جنيه للفرد
+600 جنيه للفرد
 
 دفع عند الوصول:
-700 جنيه للفرد
+800 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/ClubHouse.jpeg" },
+        caption: ` كلوب هاوس بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+2500 جنيه للفرد
+
+دفع عند الوصول:
+3500 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/Safi.jpeg" },
+        caption: ` صافي بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+4500 جنيه للفرد
+
+دفع عند الوصول:
+5000 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1121,7 +1132,7 @@ if (intent === "amwaj") {
         caption: `📍 QR أمواج
         
 Instapay or Vodafone Cash قبل الدخول:
-850 جنيه للفرد
+900 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1149,7 +1160,7 @@ Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
 دفع عند الوصول:
-1800 جنيه للفرد
+1900 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1203,7 +1214,7 @@ Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
 دفع عند الوصول:
-1800 جنيه للفرد
+1900 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1231,7 +1242,7 @@ Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
 دفع عند الوصول:
-1800 جنيه للفرد
+1900 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1695,10 +1706,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `مراسي مارينا ✨:
 
 Instapay or Vodafone Cash قبل الدخول:
-900 جنيه للعربية 🚗
+1000 جنيه للعربية 🚗
 
 دفع عند الوصول:
-1200 جنيه للعربيه 🚗`
+1400 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1706,10 +1717,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `• نورث بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-1000 جنيه للفرد
+1200 جنيه للفرد
 
 دفع عند الوصول:
-1300 جنيه للفرد
+1500 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1735,10 +1746,10 @@ note:
         caption: `حمامات سباحه المارينا  🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
-500 جنيه للفرد
+600 جنيه للفرد
 
 دفع عند الوصول:
-700 جنيه للفرد
+800 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1784,7 +1795,7 @@ note:
         caption: `📍 QR أمواج
         
 Instapay or Vodafone Cash قبل الدخول:
-850 جنيه للفرد
+900 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1812,8 +1823,7 @@ Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
 دفع عند الوصول:
-1800 جنيه للفرد
-
+1900 جنيه للفرد
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
@@ -1866,7 +1876,7 @@ Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
 دفع عند الوصول:
-1800 جنيه للفرد
+1900 جنيه للفرد
 
 يشمل:
 🏖️ البحر

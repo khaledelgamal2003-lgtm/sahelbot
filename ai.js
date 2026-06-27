@@ -183,6 +183,15 @@ function detectIntent(text = "") {
         text.includes("لمطعم") ||
         text.includes("لمطاعم") ||
         text.includes("restaurant") ||
+        text.includes("esca") ||
+        text.includes("lemon") ||
+        text.includes("lemontree") ||
+        text.includes("sass") ||
+        text.includes("kiki") ||
+        text.includes("kikis") ||
+        text.includes("sachi") ||
+        text.includes("lucida") ||
+        text.includes("cascada") ||
         text.includes("food")
     ) {
         return "restaurant";
