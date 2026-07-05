@@ -46,6 +46,20 @@ function detectIntent(text = "") {
         return "marina";
     }
 
+
+    // =====================
+    // Telal
+    // =====================
+
+    if (
+        text.includes("telal") ||
+        text.includes("تلال") ||
+        text.includes("لتلال") ||
+        text.includes("تيلال")
+    ) {
+        return "telal";
+    }
+
     // =====================
     // AMWAJ
     // =====================
@@ -317,6 +331,20 @@ function detectIntent(text = "") {
         text.includes("لنويا")
     ) {
         return "noya";
+    }
+
+        if (
+        text.includes("شاليهات") ||
+        text.includes("الشاليهات") ||
+        text.includes("الفلل") ||
+        text.includes("villa") ||
+        text.includes("chalet") ||
+        text.includes("الفلل") ||
+        text.includes("فلل") ||
+        text.includes("chalets") ||
+        text.includes("villas")
+    ) {
+        return "chalet";
     }
 
     /*

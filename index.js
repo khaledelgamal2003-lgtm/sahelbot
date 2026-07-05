@@ -263,7 +263,7 @@ if (paymentPausedUsers[user]) {
 // USER PAUSED
 // =========================
 
-if (pausedUsers[user]) {
+if (pausedUsers[user]||paymentPausedUsers[user]) {
 
     // admin bypass
     if (
@@ -287,7 +287,9 @@ if (pausedUsers[user]) {
             if (clean === "1") {
 
                 delete pausedUsers[user];
+                delete paymentPausedUsers[user];
                 savePausedUsers();
+                savePaymentPausedUsers();
                 userState[user] = {
                     step: "main_menu"
                 };
@@ -302,6 +304,8 @@ if (pausedUsers[user]) {
             // القائمة الرئيسية
             if (clean === "0") {
                 delete pausedUsers[user];
+                delete paymentPausedUsers[user];
+                savePaymentPausedUsers();
                 savePausedUsers();
 
                 //  الـ state 
@@ -329,9 +333,10 @@ if (pausedUsers[user]) {
         if (clean === "0") {
 
             delete pausedUsers[user];
+            delete paymentPausedUsers[user];
 
             savePausedUsers();
-
+            savePaymentPausedUsers();
             userState[user] = {
                 step: "main_menu"
             };
@@ -423,8 +428,10 @@ savePausedUsers();
             "@s.whatsapp.net";
 
         delete pausedUsers[target];
+        delete paymentPausedUsers[target];
 
         savePausedUsers();
+        savePaymentPausedUsers();
 
         await sock.sendMessage(target, {
             text:
@@ -480,7 +487,7 @@ if (user === ADMIN_NUMBER && text.startsWith("resume ")) {
     const target = text.replace("resume ", "").trim();
 
     pausedUsers[target + "@s.whatsapp.net"] = false;
-
+    paymentPausedUsers[target + "@s.whatsapp.net"] = false;
     await sock.sendMessage(
         target + "@s.whatsapp.net",
         {
@@ -591,6 +598,11 @@ async function sendQR(user, sock) {
 📍 سيشيل
 📍 هاسيندا باي
 📍 هاسيندا وايت
+📍 هاسيندا ريد
+📍 تلال
+📍 ماونتن فيو
+📍 بورتو مارينا
+📍 بورتو جولف
 
 ابعت اسم المكان مباشرة ❤️`
     });
@@ -599,6 +611,13 @@ async function sendQR(user, sock) {
 // YACHT JETSKI BOBOS FUNC
 async function sendBobos(user, sock) {
 
+    await sock.sendMessage(user, {
+        text:
+`اليخوت والجيتسكي غير متاحه للحجز حتي 30/7/2026
+نعمل علي توفيرها في أقرب وقت`
+    });    
+
+/*
     await sock.sendMessage(user, {
         text:
 `تأجير اليخوت والجيتسكي🛥️
@@ -623,12 +642,12 @@ async function sendBobos(user, sock) {
         text:
 `https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
     });
-
+*/
     await sock.sendMessage(user, {
             text:
-`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
-0️⃣ القائمة الرئيسية كامله`
+`0️⃣ القائمة الرئيسية كامله`
         });    
+        
 }
 
 
@@ -759,6 +778,42 @@ async function sendCars(user, sock) {
 }
 
 
+
+
+//Chalets FUNC
+async function sendchalets(user, sock) {
+
+    bookingRequests[user] = "chalets";
+
+    await sock.sendMessage(user, {
+        text:
+`🏖️ **خدمة تأجير الشاليهات والفلل في الساحل الشمالي** ✨
+
+نوفر لكم مجموعة كبيرة من الشاليهات والفلل في أفضل قرى الساحل، مع أفضل الأسعار وخدمة حجز سريعة لضمان راحتكم ❤️
+
+📍 متوفر في:
+🏝️ Marina
+🏝️ Marassi
+🏝️ Hacienda Bay
+🏝️ Hacienda White
+🏝️ Seashell
+🏝️ Amwaj
+🏝️ La Vista Bay
+🏝️ Mountain View Ras El Hekma
+🏝️ Fouka Bay
+🏝️ Telal North Coast
+🏝️ Porto Golf
+🏝️ Porto Marina
+
+برجاء إرسال:
+• اسم القرية المطلوبة
+• عدد الأفراد
+• تاريخ الوصول
+• تاريخ المغادرة
+
+وسيتم التواصل معكم فورًا بأفضل الوحدات والأسعار المناسبة لكم ✨`
+    });
+}
 //PARTY FUNC
 async function sendParty(user, sock) {
 
@@ -837,11 +892,15 @@ ${userNumber}
         text:
 `طرق الدفع:
 -في حاله طلب خدمه دفع قبل الدخول
+يتم تحويل كامل المبلغ علي أحد الحسابات:
 Instapay: 01000992177
 Vodafone Cash: 01055855696
+NBE Bank transfer: 4333011828405100010
+مع إرفاق صورة التحويل هنا
+
 
 -في حاله طلب خدمه دفع عند الوصول
-يتم التواصل معنا قبل الوصول ب 30 دقيقه وسيكون في انتظارك احد افراد طاقم العمل علي البوابات لإتمام عمليه الدخول والدفع
+يتم التواصل معنا قبل الوصول ب 30 دقيقه وسيكون في انتظارك أحد أفراد طاقم العمل علي البوابات لإتمام عملية الدخول والدفع
 
 0️⃣ للقائمة الرئيسية`
     });
@@ -857,9 +916,9 @@ async function sendMainMenu(user, sock) {
 
 1️⃣ اسعار QR
 2️⃣ الجيتسكي واليخوت
-3️⃣ حجز الشواطئ الخاصة
-4️⃣ الفنادق
-5️⃣ المطاعم
+3️⃣ حجز الشاليهات والفلل
+4️⃣ حجز الفنادق
+5️⃣ حجز المطاعم
 6️⃣ الحفلات والسهرات
 7️⃣ تأجير السيارات
 
@@ -882,14 +941,6 @@ async function sendkarl(user, sock) {
     });
 
     await sock.sendMessage(user, {
-    document: {
-        url: "Beaches/KARL/KARL.pdf"
-    },
-    mimetype: "application/pdf",
-    fileName: "KARL.pdf"
-    });
-
-    await sock.sendMessage(user, {
         text:
 `9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
@@ -908,24 +959,12 @@ async function sendnoya(user, sock) {
 مدينه العلمين الجديده`
     });
 
-await sock.sendMessage(user, {
-    document: {
-        url: "Beaches/NOYA/NOYA.pdf"
-    },
-    mimetype: "application/pdf",
-    fileName: "NOYA.pdf"
-});
-
     await sock.sendMessage(user, {
         text:
 `9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
 }
-
-
-
-
 
 
 
@@ -980,6 +1019,10 @@ if (intent === "qr") {
     return;
 }
 
+if (intent === "chalet") {
+    await sendchalets(user, sock);
+    return;
+}
 
 
 
@@ -1260,18 +1303,81 @@ Instapay or Vodafone Cash قبل الدخول:
 }
 
 
-if (intent === "mountain_view") {
+if (intent === "telal") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/telal.jpeg" },
+        caption: `📍 QR تلال
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏊 البول`
+    });
 
     await sock.sendMessage(user, {
         text:
-`📍 ماونتن ڤيو رأس الحكمة
-
-الكيو ار هيكون متاح قريبا
-
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
     });
+
     return;
 }
+
+if (intent === "mountain_view") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/mv1.jpeg" },
+        caption: `📍 QR ماونتن فيو رأس الحكمة
+
+Instapay or Vodafone Cash قبل الدخول:
+700 جنيه للعربيه 🚗
+
+دفع عند الوصول:
+1000 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
+if (intent === "telal") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/telal.jpeg" },
+        caption: `📍 QR تلال
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
 
 if (intent === "payment") {
     await handlePayment(user, userNumber, sock);
@@ -1438,7 +1544,9 @@ if (state?.step === "support_mode") {
     // الرجوع للبوت
     if (clean === "1") {
         delete pausedUsers[user];
+        delete paymentPausedUsers[user];
         savePausedUsers();
+        savePaymentPausedUsers();
         state.step = "main_menu";
         await sendMainMenu(user, sock);
     
@@ -1448,7 +1556,9 @@ if (state?.step === "support_mode") {
     // القائمة الرئيسية
     if (clean === "0"){
         delete pausedUsers[user];
+        delete paymentPausedUsers[user];
         savePausedUsers();
+        savePaymentPausedUsers();
         userState[user] = {
             step: "main_menu"
         };
@@ -1484,8 +1594,8 @@ if (state.step === "bot_mode") {
 
     else if (clean === "2") {
 
-        pausedUsers[user] = true;
-        savePausedUsers();
+        paymentPausedUsers[user] = true;
+        savePaymentPausedUsers();
 
         userState[user] = {
             step: "support_mode"
@@ -1540,18 +1650,8 @@ if (state.step === "welcome_menu") {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 // =========================
-// MAIN MENU 
+// MAIN MENU lists
 // =========================
 
 if (state.step === "main_menu") {
@@ -1571,7 +1671,9 @@ if (state.step === "main_menu") {
 4️⃣ سيشيل
 5️⃣ هاسيندا باي
 6️⃣ هاسيندا وايت
-7️⃣ ماونتن ڤيو رأس الحكمة
+7️⃣ ماونتن ڤيو
+8️⃣ تلال
+
 
 9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ رجوع`
@@ -1580,16 +1682,16 @@ if (state.step === "main_menu") {
         return;
     }
 
-    // الجيتسكي واليخوت
+    // 
     else if (clean === "2") {
         await sendBobos(user, sock);
         return;
     }
 
-    // حجز الشواطئ
+    // حجز الشاليهات
     else if (clean === "3") {
         state.step = "beach";
-        await sendbeach(user, sock);
+        await sendchalets(user, sock);
         return;
     }
 
@@ -1775,7 +1877,8 @@ note:
         image: { url: "QR/Marassi/hub.jpeg" },
         caption: `THE HUB MARASSI
 
-غير متاح حاليا`
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1895,14 +1998,51 @@ Instapay or Vodafone Cash قبل الدخول:
     // ماونتن فيو
     else if (clean === "7") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 ماونتن ڤيو رأس الحكمة
+    await sock.sendMessage(user, {
+        image: { url: "QR/mv1.jpeg" },
+        caption: `📍 QR ماونتن فيو رأس الحكمة
 
-الكيو ار هيكون متاح قريبا
+Instapay or Vodafone Cash قبل الدخول:
+700 جنيه للعربيه 🚗
 
+دفع عند الوصول:
+1000 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ القائمة الرئيسية كامله`
-        });
+    });
+
+        return;
+    }
+
+
+    // تلال
+    else if (clean === "8") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/telal.jpeg" },
+        caption: `📍 QR تلال
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
         return;
     }
 
@@ -1932,7 +2072,9 @@ Instapay or Vodafone Cash قبل الدخول:
 4️⃣ سيشيل
 5️⃣ هاسيندا باي
 6️⃣ هاسيندا وايت
-7️⃣ ماونتن ڤيو رأس الحكمة
+7️⃣ ماونتن ڤيو
+8️⃣ تلال
+
 
 9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ رجوع`
