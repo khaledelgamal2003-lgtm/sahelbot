@@ -1,612 +1,971 @@
-let pairingSent = false;
-
-sock.ev.on("connection.update", async (update) => {
-    const { connection } = update;
-
-    if (connection === "open") {
-        console.log("✅ Bot Connected");
-    }
-
-    // اطلب pairing code مرة واحدة فقط لما يكون لسه مش مسجل
-    if (!pairingSent && !sock.authState.creds.registered) {
-        pairingSent = true;
-
-        try {
-            const phoneNumber = "201055855696"; // رقمك بدون +
-
-            const code = await sock.requestPairingCode(phoneNumber);
-
-            console.log("🔑 Pairing Code:");
-            console.log(code);
-
-        } catch (err) {
-            console.log("❌ Pairing Error:", err.message);
-        }
-    }
-});
 
 
 
+//to recive data
+const bookingRequests = {};
 
 
+//AI
+const detectIntent = require("./ai");
 
+//saving data
+const fs = require("fs");
 
-
-
-
-
-    
-    // تخزين حالة كل مستخدم
-    const userState = {};
-
-    // Anti spam
-    const userLock = {};
-
-    // استقبال الرسائل
-    sock.ev.on("messages.upsert", async ({ messages }) => {
-
-        const msg = messages[0];
-
-        if (!msg.message) return;
-
-        const user = msg.key.remoteJid;
-
-//--------------------------------------------
-
-
-console.log(user);
-
-// تجاهل الجروبات
-if (user.endsWith("@g.us")) return;
-
-// استخراج الرقم
-const userNumber = user.replace("@lid", "");
-
-console.log("USER:", userNumber);
-
-
-
-
-// =========================
-// BLOCKED NUMBERS
-// =========================
-
-const blockedNumbers = [
-  //  "30228197957871"
-];
-
-// منع الأرقام
-if (blockedNumbers.includes(userNumber)) {
-
-    console.log("BLOCKED USER:", userNumber);
-
-    return;
+function saveData() {
+    fs.writeFileSync(
+        "data.json",
+        JSON.stringify({
+            userState,
+            pausedUsers,
+            waitingNote
+        }, null, 2)
+    );
 }
 
 
-        // قراءة النص
+
+
+
+
+
+
+
+
+
+const {
+    default: makeWASocket,
+    useMultiFileAuthState,
+    fetchLatestBaileysVersion
+} = require("@whiskeysockets/baileys");
+
+const qrcode = require("qrcode-terminal");
+const pino = require("pino");
+//qr_en
+async function startBot() {
+
+    const { state, saveCreds } = await useMultiFileAuthState("auth");
+    const { version } = await fetchLatestBaileysVersion();
+
+    const sock = makeWASocket({
+        version,
+        auth: state,
+        printQRInTerminal: false,
+        logger: pino({ level: "silent" })
+    });
+
+    sock.ev.on("creds.update", saveCreds);
+
+    // =========================
+    // CONNECTION
+    // =========================
+    sock.ev.on("connection.update", async (update) => {
+        const { connection, qr } = update;
+
+        if (qr) {
+            console.log("📱 Scan QR:");
+            qrcode.generate(qr, { small: true });
+        }
+
+        if (connection === "open") {
+            console.log("✅ Bot Connected");
+        }
+
+        if (connection === "close") {
+            console.log("❌ Connection closed - restarting...");
+            startBot();
+        }
+    });
+
+    // =========================
+    // STATE
+    // =========================
+    const userState = {};
+    const userLock = {};
+
+
+// =========================
+// ADMIN SETTINGS
+// =========================
+
+
+// PAYMENT PAUSED USERS
+let paymentPausedUsers = {};
+
+try {
+
+    paymentPausedUsers = JSON.parse(
+        fs.readFileSync("payment_paused.json")
+    );
+
+} catch {
+
+    paymentPausedUsers = {};
+}
+
+function savePaymentPausedUsers() {
+
+    fs.writeFileSync(
+        "payment_paused.json",
+        JSON.stringify(paymentPausedUsers, null, 2)
+    );
+}
+
+// العملاء الموقوفين
+let pausedUsers = {};
+
+try {
+
+    pausedUsers = JSON.parse(
+        fs.readFileSync("paused.json")
+    );
+
+} catch {
+
+    pausedUsers = {};
+}
+
+function savePausedUsers() {
+
+    fs.writeFileSync(
+        "paused.json",
+        JSON.stringify(pausedUsers, null, 2)
+    );
+}
+
+
+
+
+
+
+// =========================
+// ADMIN NUMBER
+// =========================
+
+const ADMIN_NUMBER = "201000992177";
+
+// waiting note
+const waitingNote = {};
+
+
+
+    sock.ev.on("messages.upsert", async ({ messages }) => {
+
+        const msg = messages[0];
+        if (!msg.message) return;
+
+        // تجاهل الرسائل القديمة
+        if (!msg.messageTimestamp) return;
+
+        if (
+            msg.key.id?.startsWith("BAE5") ||
+            msg.key.id?.startsWith("3EB0")
+        ) {
+            return;
+        }
+
+        const user = ( msg.key.remoteJidAlt ||
+            msg.key.participant ||
+            msg.key.remoteJid
+        )
+            .replace(/:.*$/, "")
+            .replace(/@lid/g, "@s.whatsapp.net");
+        if (!user) return;
+
+// تجاهل رسائل البوت نفسه
+if (msg.key.fromMe) return;
+        // تجاهل الجروبات
+        if (user.endsWith("@g.us")) return;
+
+
+
+        
+        // استخراج الرقم
+        const realUser =
+        msg.key.remoteJidAlt ||
+        msg.key.participant ||
+        msg.key.remoteJid;
+
+         const userNumber =
+        realUser
+        .replace(/:.*$/, "")
+        .replace(/@.*/g, "");
+
+        console.log("USER:", userNumber);
+                
+        // Block list
+        const blockedNumbers = [];
+
+        if (blockedNumbers.includes(userNumber)) {
+            console.log("BLOCKED USER:", userNumber);
+            return;
+        }
+
         let text =
             msg.message.conversation ||
             msg.message.extendedTextMessage?.text ||
             "";
 
         text = text.trim();
+        const intent = detectIntent(text);
 
-        // استخراج الأرقام فقط
+
+
+        text = text
+    .replace(/٠/g, "0")
+    .replace(/١/g, "1")
+    .replace(/٢/g, "2")
+    .replace(/٣/g, "3")
+    .replace(/٤/g, "4")
+    .replace(/٥/g, "5")
+    .replace(/٦/g, "6")
+    .replace(/٧/g, "7")
+    .replace(/٨/g, "8")
+    .replace(/٩/g, "9");
+
         const clean = text.replace(/[^0-9]/g, "");
 
-        // منع السبام
-        if (userLock[user]) return;
 
-        userLock[user] = true;
+// =========================
+// PAYMENT MODE
+// =========================
 
-        setTimeout(() => {
-            userLock[user] = false;
-        }, 500);
+if (paymentPausedUsers[user]) {
+    // admin bypass
+    if ( userNumber === ADMIN_NUMBER || user === ADMIN_NUMBER + "@s.whatsapp.net" ) {
+        // admin
+        }
+
+        else {
+        // الرجوع للقائمة الرئيسية فقط
+        if (clean === "0") { userState[user] = {
+            step: "main_menu" };
+            await sendMainMenu(user, sock);
+            return;
+        }
+        
+            // أي رسالة تانية
+                return;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+// =========================
+// USER PAUSED
+// =========================
+
+if (pausedUsers[user]||paymentPausedUsers[user]) {
+
+    // admin bypass
+    if (
+        userNumber === ADMIN_NUMBER ||
+        user === ADMIN_NUMBER + "@s.whatsapp.net"
+    ) {
+
+        // admin bypass
+
+    } else {
+
+        const state = userState[user];
 
         // =========================
-        // أول رسالة
+        // SUPPORT MODE
         // =========================
 
-        if (!userState[user]) {
+        if (state?.step === "support_mode") {
 
-            userState[user] = {
-                step: "language"
-            };
+            // الرجوع للبوت
+            if (clean === "1") {
 
+                delete pausedUsers[user];
+                delete paymentPausedUsers[user];
+                savePausedUsers();
+                savePaymentPausedUsers();
+                userState[user] = {
+                    step: "main_menu"
+                };
+                
+                state.step = "main menu";
+
+
+
+                return;
+            }
+
+            // القائمة الرئيسية
+            if (clean === "0") {
+                delete pausedUsers[user];
+                delete paymentPausedUsers[user];
+                savePaymentPausedUsers();
+                savePausedUsers();
+
+                //  الـ state 
+                userState[user] = {step: "main_menu"};
+                await sendMainMenu(user, sock);
+                return;
+            }
+
+            // أي رسالة تانية
             await sock.sendMessage(user, {
                 text:
-`👋 ازيك, معاك بولي من SahelJobss
-انا هنا علشان اساعدك تعرف كل حاجه
-🥰كل الي عليك ترد عليا بارقام انجليزيه زي 1 و 2 و 3 وسيب الباقي عليا
+`⏳ تم تحويلك لخدمة العملاء
 
-Please choose your language:
-1️⃣ عربي
-2️⃣ English`
+1️⃣ للتحدث مع البوت
+0️⃣ للقائمة الرئيسية`
             });
 
             return;
         }
 
-        const state = userState[user];
-
         // =========================
-        // LANGUAGE STEP
+        // NORMAL PAUSE
         // =========================
 
-        if (state.step === "language") {
+        if (clean === "0") {
 
-            // عربي
-            if (clean === "1") {
+            delete pausedUsers[user];
+            delete paymentPausedUsers[user];
 
-                state.lang = "ar";
-                state.step = "main_ar";
+            savePausedUsers();
+            savePaymentPausedUsers();
+            userState[user] = {
+                step: "main_menu"
+            };
 
-                await sock.sendMessage(user, {
-                    text:
+            await sendMainMenu(user, sock);
+
+            return;
+        }
+
+
+        return;
+    }
+}
+
+
+
+
+    
+
+if (bookingRequests[user]) {
+
+    const type = bookingRequests[user];
+
+    await sock.sendMessage(
+        ADMIN_NUMBER + "@s.whatsapp.net",
+{
+        text:
+`📥 طلب جديد
+
+👤 العميل:
+${userNumber}
+
+📌 الخدمة:
+${type}
+
+📝 التفاصيل:
+${text}`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`✅ تم ارسال طلبك بنجاح
+
+سيتم التواصل معك قريباً ❤️`
+    });
+
+    delete bookingRequests[user];
+
+    return;
+}
+        // =========================
+        // ADMIN PANEL FROM WHATSAPP
+        // =========================
+
+        if (userNumber === "201000992177") {
+
+    // إيقاف عميل
+    // مثال:
+    // pause 201055555555
+
+    if (text.startsWith("pause ")) {
+
+        const target =
+            text.replace("pause ", "")
+            .replace(/[^0-9]/g, "") +
+            "@s.whatsapp.net";
+
+        pausedUsers[target] = true;
+
+savePausedUsers();
+
+        await sock.sendMessage(user, {
+            text:
+`⛔ Client paused successfully`
+        });
+
+        return;
+    }
+
+    // تشغيل عميل
+    // مثال:
+    // resume 201055555555
+
+    if (text.startsWith("resume ")) {
+
+        const target =
+            text.replace("resume ", "")
+            .replace(/[^0-9]/g, "") +
+            "@s.whatsapp.net";
+
+        delete pausedUsers[target];
+        delete paymentPausedUsers[target];
+
+        savePausedUsers();
+        savePaymentPausedUsers();
+
+        await sock.sendMessage(target, {
+            text:
+`📋 اكتب 0 للقائمة الرئيسية`
+        });
+
+        await sock.sendMessage(user, {
+            text:
+`✅ Client resumed successfully`
+        });
+
+        return;
+    }
+
+    // إرسال رسالة لعميل
+    // مثال:
+    // send 201055555555 اهلا بيك
+
+    if (text.startsWith("send ")) {
+
+        const args = text.split(" ");
+
+        const number = args[1];
+
+        const message =
+            text.split(" ").slice(2).join(" ");
+
+        await sock.sendMessage(
+            number + "@s.whatsapp.net",
+            {
+                text: message
+            }
+        );
+
+        await sock.sendMessage(user, {
+            text:
+`✅ Message sent successfully`
+        });
+
+        return;
+    }
+}
+
+
+
+// =========================
+// ADMIN COMMANDS
+// =========================
+
+// resume 2010xxxx
+if (user === ADMIN_NUMBER && text.startsWith("resume ")) {
+
+    const target = text.replace("resume ", "").trim();
+
+    pausedUsers[target + "@s.whatsapp.net"] = false;
+    paymentPausedUsers[target + "@s.whatsapp.net"] = false;
+    await sock.sendMessage(
+        target + "@s.whatsapp.net",
+        {
+            text:
+`✅ تم استكمال المحادثة مع خدمة العملاء
+
+📋 اكتب 0 للرجوع للقائمة الرئيسية`
+        }
+    );
+
+    return;
+}
+
+// pause number
+if (user === ADMIN_NUMBER && text.startsWith("pause ")) {
+
+    const target = text.replace("pause ", "").trim();
+
+    pausedUsers[target + "@s.whatsapp.net"] = true;
+
+    return;
+}
+
+if (userNumber === ADMIN_NUMBER && text === "paused") {
+
+    const pausedList = Object.keys(pausedUsers)
+        .filter(user => pausedUsers[user]);
+
+    if (pausedList.length === 0) {
+
+        await sock.sendMessage(user, {
+            text:
+`✅ لا يوجد عملاء موقوفين`
+        });
+
+        return;
+    }
+
+    let message = "⛔ العملاء الموقوفين:\n\n";
+
+    pausedList.forEach((u, i) => {
+
+        const number =
+        u.replace(/@.*/g, "");
+
+        message += `${i + 1}- ${number}\n`;
+    });
+
+    await sock.sendMessage(user, {
+        text: message
+    });
+
+    return;
+}
+
+
+
+
+// PAYMENT PAUSED LIST
+if (userNumber === ADMIN_NUMBER && text === "paymentpaused") {
+
+    const pausedList = Object.keys(paymentPausedUsers)
+        .filter(user => paymentPausedUsers[user]);
+
+    if (pausedList.length === 0) {
+
+        await sock.sendMessage(user, {
+            text:
+`✅ لا يوجد عملاء دفع موقوفين`
+        });
+
+        return;
+    }
+
+    let message = "💳 العملاء الموقوفين بسبب الدفع:\n\n";
+
+    pausedList.forEach((u, i) => {
+
+        const number =
+            u.replace(/@.*/g, "");
+
+        message += `${i + 1}- ${number}\n`;
+    });
+
+    await sock.sendMessage(user, {
+        text: message
+    });
+
+    return;
+}
+
+
+
+//====================================
+//              FUNCTIONS
+//====================================
+
+//  QR FUNC
+async function sendQR(user, sock) {
+
+    await sock.sendMessage(user, {
+        text:
+`📲 اسعار الـ QR المتاحة:
+
+📍 مارينا
+📍 مراسي
+📍 أمواج
+📍 سيشيل
+📍 هاسيندا باي
+📍 هاسيندا وايت
+📍 هاسيندا ريد
+📍 تلال
+📍 ماونتن فيو
+📍 بورتو مارينا
+📍 بورتو جولف
+
+ابعت اسم المكان مباشرة ❤️`
+    });
+}
+
+// YACHT JETSKI BOBOS FUNC
+async function sendBobos(user, sock) {
+
+    await sock.sendMessage(user, {
+        text:
+`اليخوت والجيتسكي غير متاحه للحجز حتي 30/7/2026
+نعمل علي توفيرها في أقرب وقت`
+    });    
+
+/*
+    await sock.sendMessage(user, {
+        text:
+`تأجير اليخوت والجيتسكي🛥️
+
+المكان: New BOBOS Water Sports Spot
+
+يتم دفع 500 جنيه جديه حجز ويتم خصمهم من اجمالي التكلفه`
+    });    
+
+        await sock.sendMessage(user, {
+    document: {
+        url: "BOBOS/BOBOS.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "BOBOS.pdf"
+    });
+
+
+
+
+    await sock.sendMessage(user, {
+        text:
+`https://maps.app.goo.gl/TPaZ4rMCwJne9kFg6`
+    });
+*/
+    await sock.sendMessage(user, {
+            text:
+`0️⃣ القائمة الرئيسية كامله`
+        });    
+        
+}
+
+
+
+
+//BEACH FUNC
+async function sendbeach(user, sock) {
+
+await sock.sendMessage(user, {
+            text:
+`الشواطئ المتاحه للحجز
+
+1️⃣ KARL beach new alamein
+2️⃣ NOYA beach new alamein
+
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ رجوع`
+        });
+
+}
+
+//HOTEL FUNC
+async function sendHotel(user, sock) {
+
+    bookingRequests[user] = "hotel";
+
+    await sock.sendMessage(user, {
+        text:
+`🏨 خدمة حجز الفنادق بأفضل الأسعار ✨
+
+استمتع بإقامة فاخرة في أفخم فنادق الساحل الشمالي ❤️
+وبسعر مخفض حصريا لدي شركتنا
+
+متاح الحجز في:
+📍 Rixos Premium Alamein
+📍 Address Beach Resort Marassi
+📍 Address Golf Resort Marassi
+📍 Vida Marina Resort Marassi
+📍 Palace Beach Resort Marassi
+📍 Al Alamein Hotel Resort & Spa
+📍 Porto Marina Hotel
+📍 Tolip Resort Sunrays
+📍 Regal Heights Hotel
+📍 Crystal Inn Hotel
+📍 Jaz Almaza Beach Resort
+
+برجاء إرسال:
+• عدد الأفراد
+• تاريخ الوصول
+• عدد الليالي
+• اسم الفندق أو المنطقة المطلوبة
+
+وسيتم التواصل معكم فورًا بأفضل العروض والأسعار ✨`
+    });
+}
+
+//RESTUARANT FUNC
+async function sendRestaurant(user, sock) {
+
+    bookingRequests[user] = "restaurant";
+
+    await sock.sendMessage(user, {
+        text:
+`🍽️ المطاعم المتاحة للحجز:
+
+• Crave (Marassi)
+• Ovio (Marassi)
+• Eatery (Marassi)
+• The Lemon Tree & Co.
+• SACHI By The Sea
+• Kiki's (Hacienda White)
+• Boulevard (Seashell)
+• il Nilo (Seashell)
+• Izmir Saray Turkish (Seashell)
+• White & Blue (Ghazala Bay)
+• Aklet Samak  (in front of Marassi)
+• Princess (O mall)
+
+
+📝 برجاء ارسال:
+- اسم المطعم
+- عدد الأفراد
+- اليوم
+- فطار/غداء/عشاء`
+    });
+}
+
+
+//CARS FUNC
+async function sendCars(user, sock) {
+
+    bookingRequests[user] = "cars";
+
+    await sock.sendMessage(user, {
+        text:
+`🚗 خدمة تأجير السيارات الفارهة ✨
+
+نوفر اسطول ضخم من السيارات بسائق او بدون لضمان راحتك❤️
+
+🚘 Mercedes G63 BRABUS Kit
+🚘 Mercedes S450
+🚘 Mercedes S400
+🚘 Mercedes E200
+🚘 Mercedes C200 Cabrio
+🚘 Mercedes C180
+🚘 Range Rover Sport
+🚘 Porsche Cayenne
+🚘 Porsche Macan
+🚘 Jeep Grand Cherokee Limited
+🚘 Toyota Fortuner
+🚘 Toyota Corolla
+🚘 Kia Sportage
+🚘 Jetour T2
+🚘 Jetour Dashing
+🚘 Hyundai Elantra
+🚘 Nissan Sunny
+🚘 MG 5
+🚘 MG 6
+
+برجاء إرسال:
+• نوع السيارة المطلوبة
+• مدة الإيجار
+• مكان الاستلام
+• تاريخ ووقت الاستلام
+
+وسيتم التواصل معكم فورًا بأفضل العروض والأسعار ✨`
+    });
+}
+
+
+
+
+//Chalets FUNC
+async function sendchalets(user, sock) {
+
+    bookingRequests[user] = "chalets";
+
+    await sock.sendMessage(user, {
+        text:
+`🏖️ **خدمة تأجير الشاليهات والفلل في الساحل الشمالي** ✨
+
+نوفر لكم مجموعة كبيرة من الشاليهات والفلل في أفضل قرى الساحل، مع أفضل الأسعار وخدمة حجز سريعة لضمان راحتكم ❤️
+
+📍 متوفر في:
+🏝️ Marina
+🏝️ Marassi
+🏝️ Hacienda Bay
+🏝️ Hacienda White
+🏝️ Seashell
+🏝️ Amwaj
+🏝️ La Vista Bay
+🏝️ Mountain View Ras El Hekma
+🏝️ Fouka Bay
+🏝️ Telal North Coast
+🏝️ Porto Golf
+🏝️ Porto Marina
+
+برجاء إرسال:
+• اسم القرية المطلوبة
+• عدد الأفراد
+• تاريخ الوصول
+• تاريخ المغادرة
+
+وسيتم التواصل معكم فورًا بأفضل الوحدات والأسعار المناسبة لكم ✨`
+    });
+}
+//PARTY FUNC
+async function sendParty(user, sock) {
+
+    bookingRequests[user] = "party";
+
+    await sock.sendMessage(user, {
+    document: {
+        url: "Party/PARTY.pdf"
+    },
+    mimetype: "application/pdf",
+    fileName: "PARTY.pdf"
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`يرجاء الاطلاع علي الملف المرفق 
+ثم اختيار:
+الحفلة وعدد التذاكر
+مع ايضاح اي تفاصيل او ملاحظات 
+وسيقوم أحد ممثلي خدمة العملاء بالرد عليكم❤️`
+    });
+}
+
+
+//PRICE FUNC
+async function sendPrices(user, sock) {
+
+    await sock.sendMessage(user, {
+        text:
+`💰 الأسعار تختلف حسب:
+
+📍 المكان
+📅 التاريخ
+👥 عدد الأفراد
+
+ابعت اسم الخدمة أو المكان لمعرفة السعر ❤️
+
+او ابعت رقم 0 للقائمه الرئيسيه`
+    });
+}
+
+
+// PAYMENT FUNC
+async function handlePayment(user, userNumber, sock) {
+
+    paymentPausedUsers[user] = true;
+
+    savePaymentPausedUsers();
+
+    await sock.sendMessage(
+        ADMIN_NUMBER + "@s.whatsapp.net",
+{
+        text:
+`💰 طلب دفع جديد
+
+👤 الرقم:
+${userNumber}
+
+📍 العميل جاهز للدفع`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/instructions.jpg" },
+        caption:"تعليمات استخدام ال QR"
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`✅ تم تحويل طلبك لخدمة العملاء
+
+برجاء انتظار التواصل معك ❤️`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`طرق الدفع:
+-في حاله طلب خدمه دفع قبل الدخول
+يتم تحويل كامل المبلغ علي أحد الحسابات:
+Instapay: 01000992177
+Vodafone Cash: 01055855696
+NBE Bank transfer: 4333011828405100010
+مع إرفاق صورة التحويل هنا
+
+
+-في حاله طلب خدمه دفع عند الوصول
+يتم التواصل معنا قبل الوصول ب 30 دقيقه وسيكون في انتظارك أحد أفراد طاقم العمل علي البوابات لإتمام عملية الدخول والدفع
+
+0️⃣ للقائمة الرئيسية`
+    });
+}
+
+// MAIN MENU FUNC
+
+async function sendMainMenu(user, sock) {
+
+    await sock.sendMessage(user, {
+        text:
 `📋 القائمة الرئيسية
 
 1️⃣ اسعار QR
 2️⃣ الجيتسكي واليخوت
-3️⃣ الفنادق
-4️⃣ المطاعم
-5️⃣ إيجار السيارات
-6️⃣ توصيل من والي مطار العلمين`
-                });
+3️⃣ حجز الشاليهات والفلل
+4️⃣ حجز الفنادق
+5️⃣ حجز المطاعم
+6️⃣ الحفلات والسهرات
+7️⃣ تأجير السيارات
 
-                return;
-            }
+8️⃣ السياسات والشروط
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء`
+    });
+}
 
-            // English
-            else if (clean === "2") {
 
-                state.lang = "en";
-                state.step = "main_en";
 
-                await sock.sendMessage(user, {
-                    text:
-`📋 Main Menu
+//------beaches------------------------------------------------
 
-1️⃣ QR Prices
-2️⃣ Jetski & Yachts
-3️⃣ Chalets & Villas
-4️⃣ Hotels reservations
-5️⃣ Restaurants
-6️⃣ Car rentals
-7️⃣ Airport pick up and drop off
-8️⃣ Terms and Policies`
-                });
+//KARL
+async function sendkarl(user, sock) {
 
-                return;
-            }
+    await sock.sendMessage(user, {
+        text:
+`حجوزات شاطئ كارل بيتش
+مدينه العلمين الجديده`
+    });
 
-            else {
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+}
 
-                await sock.sendMessage(user, {
-                    text: "❗ Please choose 1 or 2 only"
-                });
 
-                return;
-            }
-        }
 
-        // =========================
-        // MAIN MENU ENGLISH
-        // =========================
 
-        if (state.step === "main_en") {
+//NOYA
+async function sendnoya(user, sock) {
 
-            // QR Prices
-            if (clean === "1") {
+    await sock.sendMessage(user, {
+        text:
+`حجوزات شاطئ نويا بيتش
+مدينه العلمين الجديده`
+    });
 
-                state.step = "qr_en";
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+}
 
-                await sock.sendMessage(user, {
-                    text:
-`📲 QR Prices
-
-1️⃣ Marina
-2️⃣ Marassi
-3️⃣ Amwaj
-4️⃣ Seashell
-5️⃣ Hacienda-Bay
-6️⃣ Hacinda-White
-7️⃣ Mountain view ras elhekma
-0️⃣ Back`
-                });
-
-                return;
-            }
-
-            // Jetski
-            else if (clean === "2") {
-
-                state.step = "jetski_en";
-
-                await sock.sendMessage(user, {
-                    text:
-`🛥️ Jetski & Yachts
-
-1️⃣ Jetski at Marina
-2️⃣ Yacht at Marina
-3️⃣ Jetski at Marassi
-4️⃣ Yacht at Marassi
-0️⃣ Back`
-                });
-
-                return;
-            }
-//-------------------
-            // Chalets & Villas
-            else if (clean === "3") {
-                await sock.sendMessage(user, {
-                    text:
-`For Renting a Chalet or Villa
-Please wait till customer service contact you.`
-                });
-
-                return;
-            }
-//-----------------------
-            // Holtels
-            else if (clean === "4") {
-                await sock.sendMessage(user, {
-                    text:
-`📲 Hotels Reservation
-Coming Soon...
-
-0️⃣ Back`
-                });
-                return;
-            }
-
-            // Restaurants
-            else if (clean === "5") {
-                await sock.sendMessage(user, {
-                    text:
-`📲 Resturants Reservation
-Coming Soon...
-
-0️⃣ Back`
-                });
-                return;
-            }
-
-            // Car rentals
-            else if (clean === "6") {
-                await sock.sendMessage(user, {
-                    text:
-`📲 Car Rentals
-Coming Soon...
-
-0️⃣ Back`
-                });
-                return;
-            }
-
-            // Airpot
-            else if (clean === "7") {
-                await sock.sendMessage(user, {
-                    text:
-`📲 Airport Cars
-Coming Soon...
-
-0️⃣ Back`
-                });
-                return;
-            }
-
-            // Terms and Policies
-            else if (clean === "8") {
-                await sock.sendMessage(user, {
-                    text:
-`Terms & Polices
-
-- If you require a QR code, a SahelJobss representative will meet you at the gate. They will have your QR code and will allow you entry. You will pay after entering. This ensures you can enter first and then pay.
-
-- At the beaches, security may ask about the source of your QR code. Simply tell them it's from a friend. We are not responsible if you provide any other information.
-
-- Prices are subject to change. Prices increase during holidays, peak seasons, and on Thursdays and Fridays. The price list we send you is updated daily.
-
-- Available payment methods: Instapay / VodafoneCash / Bank Transfer. For some services, we may accept cash.
-
-- Jet ski bookings at Marina require a minimum deposit of 500 EGP, which will be deducted from the total price.
-
-- Yachts at Marina do not require bookings. However, if you are coming from outside Marina, a 500 EGP deposit is required, which will be deducted from the total price.
-
-- We offer hotel bookings at prices lower than other available websites. You will be informed of the percentage of bookings we will receive.
-
-- Car rentals are for Egyptians only. A security check is conducted 24 hours before the car is returned.
-
-- SahelJobss helps you have a happy vacation without displeasing God. We are not responsible for any misuse of our services.
-
-0️⃣ Back`
-                });
-                return;
-            }            
-
-            //Back
-            else {
-
-                await sock.sendMessage(user, {
-                    text:
-`📋 Main Menu
-
-1️⃣ QR Prices
-2️⃣ Jetski & Yachts
-3️⃣ Chalets & Villas
-4️⃣ Hotels reservations
-5️⃣ Restaurants
-6️⃣ Car rentals
-7️⃣ Airport pick up and drop off
-8️⃣ Terms and Policies`
-
-                });
-
-                return;
-            }
-        }
-
-        // =========================
-        // QR MENU
-        // =========================
-
-        if (state.step === "qr_en") {
-
-            // Marina
-            if (clean === "1") {
-
-                await sock.sendMessage(user, {
-                    text: "📍 Marina QR Price:300 EGP per car"
-                });
-
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-
-                return;
-            }
-
-            // Marassi
-            else if (clean === "2") {
-
-                await sock.sendMessage(user, {
-                    text:
-`📍 Marassi Prices:
-
-• Marassi Marina:
-700 EGP per car
-
-• Marassi Blanca Lagoon:
-2500 EGP per car
-
-• Marassi North Beach:
-1000 EGP per person`
-                });
-
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-                return;
-            }
-
-            // Amwaj
-            else if (clean === "3") {
-
-                await sock.sendMessage(user, {
-                    text:
-`📍 Amwaj QR Price:
-
-600 EGP per person
-Includes beach & lagoon access`
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-                return;
-            }
-
-            // Seashell
-            else if (clean === "4") {
-
-                await sock.sendMessage(user, {
-                    text:
-`📍 Seashell QR Price:
-
-1500 EGP per person
-Includes beach & lagoon access`
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-                return;
-            }
-            // Hacienda-Bay
-            else if (clean === "5") {
-
-                await sock.sendMessage(user, {
-                    text:
-`📍 Hacienda-Bay QR Price:
-
-800 EGP per person
-Includes beach & lagoon access`
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-                return;
-            }
-            // Hacinda-White
-            else if (clean === "6") {
-
-                await sock.sendMessage(user, {
-                    text:
-`📍 Hacinda-White QR Price:
-
-900 EGP per person
-Includes beach & lagoon access`
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-                return;
-            }
-            // Mountain view ras elhekma
-            else if (clean === "7") {
-
-                await sock.sendMessage(user, {
-                    text:
-`📍 Mountain view ras elhekma QR
-NOT AVAILABLE AT THE MOMENT`
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-                return;
-            }
-            // Back
-            else if (clean === "0") {
-
-                state.step = "main_en";
-
-                await sock.sendMessage(user, {
-                    text:
-`📋 Main Menu
-
-1️⃣ QR Prices
-2️⃣ Jetski & Yachts
-3️⃣ Hotels reservations
-4️⃣ Restaurants
-5️⃣ Car rentals
-6️⃣ Airport pick up and drop off
-7️⃣ Terms and Policies`
-                });
-
-                return;
-            }
-
-            else {
-
-                await sock.sendMessage(user, {
-                    text:
-`📲 QR Prices
-
-1️⃣ Marina
-2️⃣ Marassi
-3️⃣ Amwaj
-4️⃣ Seashell
-5️⃣ Hacienda-Bay
-6️⃣ Hacinda-White
-7️⃣ Mountain view ras elhekma
-0️⃣ Back`
-                });
-
-                return;
-            }
-        }
-
-        // =========================
-        // JETSKI MENU
-        // =========================
-
-        if (state.step === "jetski_en") {
-
-            // Jetski Marina
-            if (clean === "1") {
-
-                await sock.sendMessage(user, {
-                    text: `15 min = 1500 EGP
-30 min = 2500 EGP
-60 min = 5000 EGP
-
-Price includes marina QR entry`
-
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-
-                return;
-            }
-
-            // Yacht Marina
-            else if (clean === "2") {
-
-                await sock.sendMessage(user, {
-                    text: "🛥️ Yacht service available soon"
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-
-                return;
-            }
-            // Jetski Marassi
-            else if (clean === "3") {
-
-                await sock.sendMessage(user, {
-                    text:
-`🛥️ Jetski Marassi
-
-💰 10,000 EGP / hour
-
-Includes Safi Beach access for the whole day`
-                });
-                await sock.sendMessage(user, {
-                    text:
-`0️⃣ Main Menu`
-                });
-                return;
-            }
-            // Yacht Marassi
-            else if (clean === "4") {
-
-                await sock.sendMessage(user, {
-                    text: "🛥️ Yacht service available soon"
-                });
-                await sock.sendMessage(user, {
-                    text: "0️⃣ Main Menu"
-                });
-
-                return;
-            }
-            // Back
-            else if (clean === "0") {
-
-                state.step = "main_en";
-
-                await sock.sendMessage(user, {
-                    text:
-`📋 Main Menu
-
-1️⃣ QR Prices
-2️⃣ Jetski & Yachts
-3️⃣ Hotels reservations
-4️⃣ Restaurants
-5️⃣ Car rentals
-6️⃣ Airport pick up and drop off
-7️⃣ Terms and Policies`
-                });
-
-                return;
-            }
-
-            else {
-
-                await sock.sendMessage(user, {
-                    text:
-`🛥️ Jetski & Yachts
-
-1️⃣ Jetski at Marina
-2️⃣ Yacht at Marina
-3️⃣ Jetski at Marassi
-4️⃣ Yacht at Marassi
-0️⃣ Back`
-                });
-
-                return;
-            }
-        }
 
 
 
@@ -614,15 +973,693 @@ Includes Safi Beach access for the whole day`
 
 
 // =========================
-// MAIN MENU ARABIC
+// NOTE MODE
 // =========================
 
-if (state.step === "main_ar") {
+if (waitingNote[user]) {
+
+   await sock.sendMessage(
+    ADMIN_NUMBER + "@s.whatsapp.net",
+{
+        text:
+`📩 New Note
+
+👤 Number:
+${userNumber}
+
+📝 Message:
+${text}`
+    });
+
+    waitingNote[user] = false;
+
+    await sock.sendMessage(user, {
+        text:
+`✅ شكراً ليك
+
+تم استلام رسالتك وهيتم التواصل معاك في أقرب وقت ❤️
+
+0️⃣ القائمة الرئيسية`
+    });
+
+    return;
+}
+
+
+
+        // anti spam بسيط
+        if (userLock[user]) return;
+        userLock[user] = true;
+        setTimeout(() => delete userLock[user], 1000);
+
+
+
+if (intent === "qr") {
+    await sendQR(user, sock);
+    return;
+}
+
+if (intent === "chalet") {
+    await sendchalets(user, sock);
+    return;
+}
+
+
+
+if (intent === "marina") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/marina.jpg" },
+        caption: `📍 QR مارينا
+
+Instapay or Vodafone Cash قبل الدخول:
+🚗 250 جنيه للعربية
+
+دفع عند الوصول:
+🚗 400 جنيه للعربية`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
+if (intent === "marassi") {
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/marina1.jpeg" },
+        caption: `مراسي مارينا ✨:
+
+Instapay or Vodafone Cash قبل الدخول:
+1000 جنيه للعربية 🚗
+
+دفع عند الوصول:
+1400 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/north1.jpeg" },
+        caption: `نورث بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+1200 جنيه للفرد
+
+دفع عند الوصول:
+1500 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/blancalagoon.jpeg" },
+        caption: `مراسي بلانكا 🏝️:
+
+Instapay or Vodafone Cash قبل الدخول:
+2500 جنيه للعربيه 🚗
+
+دفع عند الوصول:
+3000 جنيه للعربيه 🚗
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/marinalagoon.jpg" },
+        caption: `حمامات سباحه المارينا  🏝️:
+
+Instapay or Vodafone Cash قبل الدخول:
+600 جنيه للفرد
+
+دفع عند الوصول:
+800 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/ClubHouse.jpeg" },
+        caption: ` كلوب هاوس بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+2500 جنيه للفرد
+
+دفع عند الوصول:
+3500 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/Safi.jpeg" },
+        caption: ` صافي بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+4500 جنيه للفرد
+
+دفع عند الوصول:
+5000 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/waterworld.jpeg" },
+        caption: ` مراسي واتر وورلد 🏝️:
+
+تذكره لشخص بالغ:
+2500 جنيه
+
+تذكره لطفل أقصر من 120 سم:
+2000 جنيه
+
+note:
+السعر يشمل qr البوابه الخارجيه
+الأطفال أطول من 120 سم يتم احتسابهم بالغين`
+    });    
+    
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/hub.jpeg" },
+        caption: `THE HUB MARASSI
+
+غير متاح حاليا`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+if (intent === "amwaj") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/amwaj1.jpeg" },
+        caption: `📍 QR أمواج
+        
+Instapay or Vodafone Cash قبل الدخول:
+900 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+if (intent === "seashell") {
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/seashell2.jpeg" },
+        caption: `📍 QR سيشيل
+
+Instapay or Vodafone Cash قبل الدخول:
+1500 جنيه للفرد
+
+دفع عند الوصول:
+1900 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+if (intent === "hacienda_bay") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/haceindabay1.jpeg" },
+        caption: `📍 QR هاسيندا باي
+
+Instapay or Vodafone Cash قبل الدخول:
+700 جنيه للفرد
+
+دفع عند الوصول:
+900 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+if (intent === "hacienda_white") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/haceindawhite1.jpeg" },
+        caption: `📍 QR هاسيندا وايت
+
+Instapay or Vodafone Cash قبل الدخول:
+1500 جنيه للفرد
+
+دفع عند الوصول:
+1900 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
+if (intent === "hacienda_red") {
+
+        await sock.sendMessage(user, {
+        image: { url: "QR/haceindared1.jpeg" },
+        caption: `📍 QR هاسيندا ريد
+
+Instapay or Vodafone Cash قبل الدخول:
+1500 جنيه للفرد
+
+دفع عند الوصول:
+1900 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
+if (intent === "telal") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/telal.jpeg" },
+        caption: `📍 QR تلال
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+if (intent === "mountain_view") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/mv1.jpeg" },
+        caption: `📍 QR ماونتن فيو رأس الحكمة
+
+Instapay or Vodafone Cash قبل الدخول:
+700 جنيه للعربيه 🚗
+
+دفع عند الوصول:
+1000 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
+if (intent === "telal") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/telal.jpeg" },
+        caption: `📍 QR تلال
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+
+if (intent === "payment") {
+    await handlePayment(user, userNumber, sock);
+    return;
+}
+
+if (intent === "restaurant") {
+    await sendRestaurant(user, sock);
+    return;
+}
+
+if (intent === "cars") {
+    await sendCars(user, sock);
+    return;
+}
+
+
+if (intent === "prices") {
+    await sock.sendMessage(user, {
+        text:
+`💰 الأسعار تختلف حسب:
+
+📍 المكان
+📅 التاريخ
+👥 عدد الأفراد
+
+ابعت اسم الخدمة أو المكان لمعرفة السعر ❤️`
+    });
+    return;
+}
+
+if (intent === "jetski") {
+    await sendBobos(user, sock);
+    return;
+}
+
+if (intent === "yacht") {
+    await sendBobos(user, sock);
+    return;
+}
+
+if (intent === "party") {
+    await sendParty(user, sock);
+    return;
+}
+
+if (intent === "support") {
+
+    pausedUsers[user] = true;
+    savePausedUsers();
+
+    await sock.sendMessage(
+        ADMIN_NUMBER + "@s.whatsapp.net",
+{
+        text:
+`📞 العميل يريد خدمة عملاء
+
+👤 ${userNumber}`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`✅ تم تحويلك لخدمة العملاء
+حد هيرد عليك قريب جدا`
+    });
+
+    return;
+}
+
+//--------beaches----------
+
+if (intent === "karl") {
+    await sendkarl(user, sock);
+    return;
+}
+
+
+
+if (intent === "noya") {
+    await sendnoya(user, sock);
+    return;
+}
+
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =================================================FIRST MESSAGE=======================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+// =====================================================================================================================
+
+if (!userState[user]) {
+
+    userState[user] = { step: "bot_mode" };
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/WELCOME.jpg" },
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`👋 أهلاً بيك في SahelJobss ❤️
+
+كل الي عليك ابعت رقم 1 او 2
+
+1️⃣ لو لسه عايز تعرف الأسعار والتفاصيل
+2️⃣  لو عايز تكلم خدمة العملاء وتحجز`
+    });
+
+    return;
+}
+
+
+
+// =========================
+// WAITING NOTE
+// =========================
+
+if (waitingNote[user]) {
+
+    waitingNote[user] = false;
+
+    await sock.sendMessage(
+    ADMIN_NUMBER + "@s.whatsapp.net",
+{
+        text:
+`📩 New Note
+
+👤 Client:
+${userNumber}
+
+📝 Message:
+${text}`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`✅ شكراً ليك
+
+📩 تم استلام رسالتك وهيتم التواصل معاك في أقرب وقت`
+    });
+
+    return;
+}
+
+const state = userState[user];
+
+// =========================
+// SUPPORT MODE AT FIRST MSG
+// =========================
+if (state?.step === "support_mode") {
+    // الرجوع للبوت
+    if (clean === "1") {
+        delete pausedUsers[user];
+        delete paymentPausedUsers[user];
+        savePausedUsers();
+        savePaymentPausedUsers();
+        state.step = "main_menu";
+        await sendMainMenu(user, sock);
+    
+        return;
+    }
+
+    // القائمة الرئيسية
+    if (clean === "0"){
+        delete pausedUsers[user];
+        delete paymentPausedUsers[user];
+        savePausedUsers();
+        savePaymentPausedUsers();
+        userState[user] = {
+            step: "main_menu"
+        };
+        await sendMainMenu(user, sock);
+
+        return;
+    }
+    // أي رسالة تانية
+    await sock.sendMessage(user, {
+        text:
+`1️⃣ للتحدث مع البوت
+0️⃣ للقائمة الرئيسية`
+    });
+
+    return;
+}
+
+
+
+
+// =========================
+// BOT MODE STEP
+// =========================
+
+if (state.step === "bot_mode") {
+
+    if (clean === "1") {
+        state.step = "main_menu";
+        userState[user] = {step: "main_menu" };
+        await sendMainMenu(user, sock);
+        return;
+    }
+
+    else if (clean === "2") {
+
+        paymentPausedUsers[user] = true;
+        savePaymentPausedUsers();
+
+        userState[user] = {
+            step: "support_mode"
+        };
+
+        await sock.sendMessage(
+            ADMIN_NUMBER + "@s.whatsapp.net",
+{
+            text:
+`📞 عميل جديد طلب التحدث مع خدمة العملاء
+
+👤 الرقم:
+${userNumber}`
+        });
+
+        await sock.sendMessage(user, {
+            text:
+`✅ تم تحويلك لخدمة العملاء
+
+1️⃣ للتحدث مع البوت
+0️⃣ للقائمة الرئيسيه`
+        });
+
+        return;
+    }
+
+    else if (clean === "9") {
+        await handlePayment(user, userNumber, sock);
+        return;
+    }
+
+
+    return;
+}
+
+
+// =========================
+// WELCOME MENU
+// =========================
+
+if (state.step === "welcome_menu") {
+
+    if (
+        text.includes("0") ||
+        text.includes("menu")
+    ) {
+
+        state.step = "main_menu";
+        await sendMainMenu(user, sock);
+        return;
+    }
+}
+
+
+// =========================
+// MAIN MENU lists
+// =========================
+
+if (state.step === "main_menu") {
 
     // اسعار QR
     if (clean === "1") {
 
-        state.step = "qr_ar";
+        state.step = "qr";
 
         await sock.sendMessage(user, {
             text:
@@ -634,103 +1671,54 @@ if (state.step === "main_ar") {
 4️⃣ سيشيل
 5️⃣ هاسيندا باي
 6️⃣ هاسيندا وايت
-7️⃣ ماونتن ڤيو رأس الحكمة
+7️⃣ ماونتن ڤيو
+8️⃣ تلال
+
+
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ رجوع`
         });
 
         return;
     }
 
-    // جيتسكي ويخوت
+    // 
     else if (clean === "2") {
-
-        state.step = "jetski_ar";
-
-        await sock.sendMessage(user, {
-            text:
-`🛥️ الجيتسكي واليخوت
-
-1️⃣ جيتسكي مارينا
-2️⃣ يخت مارينا
-3️⃣ جيتسكي مراسي
-4️⃣ يخت مراسي
-0️⃣ رجوع`
-        });
-
+        await sendBobos(user, sock);
         return;
     }
 
-    // الشاليهات والفيلات
+    // حجز الشاليهات
     else if (clean === "3") {
-
-        await sock.sendMessage(user, {
-            text:
-`🏡 لحجز شاليه أو فيلا
-
-برجاء الانتظار حتي يتم التواصل معك من خدمة العملاء`
-        });
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+        state.step = "beach";
+        await sendchalets(user, sock);
         return;
     }
 
     // الفنادق
     else if (clean === "4") {
-        await sock.sendMessage(user, {
-            text:
-`🏨 حجز الفنادق
-
-قريباً...
-
-0️⃣ رجوع`
-        });
-
+        await sendHotel(user, sock);
         return;
     }
 
     // المطاعم
     else if (clean === "5") {
-        await sock.sendMessage(user, {
-            text:
-`🍽️ حجز المطاعم
+        await sendRestaurant(user, sock);
+        return;
+    }
 
-قريباً...
-
-0️⃣ رجوع`
-        });
-
+    // الحفلات
+    else if (clean === "6") {
+        await sendParty(user, sock);
         return;
     }
 
     // تأجير سيارات
-    else if (clean === "6") {
-        await sock.sendMessage(user, {
-            text:
-`🚗 تأجير السيارات
-
-قريباً...
-
-0️⃣ رجوع`
-        });
-
-        return;
-    }
-
-    // المطار
     else if (clean === "7") {
-        await sock.sendMessage(user, {
-            text:
-`✈️ توصيل من وإلي المطار
-
-قريباً...
-
-0️⃣ رجوع`
-        });
-
+    await sendcars(user, sock);
         return;
     }
-//---------------
+
     // السياسات والشروط
     else if (clean === "8") {
         await sock.sendMessage(user, {
@@ -757,70 +1745,147 @@ if (state.step === "main_ar") {
 0️⃣ الرجوع للقائمه`
         });
 
+        await sock.sendMessage(user, {
+            image: { url: "QR/instructions.jpg" },
+            caption: "برجاء الالتزام بالتعليمات اعلاه"
+        });
+
+
+        return;
+    }
+
+
+
+
+    // Leave Note
+    else if (clean === "9") {
+
+        await handlePayment(user, sock);
         return;
     }
 //----------------
 
     else {
-
-        await sock.sendMessage(user, {
-            text:
-`📋 القائمة الرئيسية
-
-1️⃣ اسعار QR
-2️⃣ الجيتسكي واليخوت
-3️⃣ الشاليهات والفيلات
-4️⃣ الفنادق
-5️⃣ المطاعم
-6️⃣ إيجار السيارات
-7️⃣ توصيل من والي مطار العلمين
-8️⃣ السياسات والشروط`
-        });
-
+        await sendMainMenu(user, sock);
         return;
     }
 }
 
 // =========================
-// QR MENU ARABIC
+// QR MENU 
 // =========================
 
-if (state.step === "qr_ar") {
+if (state.step === "qr") {
 
     // مارينا
     if (clean === "1") {
 
-        await sock.sendMessage(user, {
-            text: "📍 سعر QR مارينا: 300 جنيه للعربية"
-        });
+    await sock.sendMessage(user, {
+        image: { url: "QR/marina.jpg" },
+        caption: `📍 QR مارينا
 
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+Instapay or Vodafone Cash قبل الدخول:
+🚗 250 جنيه للعربية
 
+دفع عند الوصول:
+🚗 400 جنيه للعربية`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
         return;
     }
 
     // مراسي
     else if (clean === "2") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 اسعار مراسي:
 
-• مراسي مارينا:
-700 جنيه للعربية
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/marina1.jpeg" },
+        caption: `مراسي مارينا ✨:
 
-• مراسي بلانكا لاجون:
-2500 جنيه للعربية
+Instapay or Vodafone Cash قبل الدخول:
+1000 جنيه للعربية 🚗
 
-• مراسي نورث بيتش:
-1000 جنيه للفرد`
-        });
+دفع عند الوصول:
+1400 جنيه للعربيه 🚗`
+    });
 
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/north1.jpeg" },
+        caption: `• نورث بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+1200 جنيه للفرد
+
+دفع عند الوصول:
+1500 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/blancalagoon.jpeg" },
+        caption: `• مراسي بلانكا 🏝️:
+
+Instapay or Vodafone Cash قبل الدخول:
+2500 جنيه للعربيه 🚗
+
+دفع عند الوصول:
+3000 جنيه للعربيه 🚗
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/marinalagoon.jpg" },
+        caption: `حمامات سباحه المارينا  🏝️:
+
+Instapay or Vodafone Cash قبل الدخول:
+600 جنيه للفرد
+
+دفع عند الوصول:
+800 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/waterworld.jpeg" },
+        caption: ` مراسي واتر وورلد 🏝️:
+
+تذكره لشخص بالغ:
+2500 جنيه
+
+تذكره لطفل أقصر من 120 سم:
+2000 جنيه
+
+note:
+السعر يشمل qr البوابه الخارجيه
+الأطفال أطول من 120 سم يتم احتسابهم بالغين`
+    });    
+    
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/hub.jpeg" },
+        caption: `THE HUB MARASSI
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
 
         return;
     }
@@ -828,18 +1893,24 @@ if (state.step === "qr_ar") {
     // أمواج
     else if (clean === "3") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 سعر QR أمواج:
+    await sock.sendMessage(user, {
+        image: { url: "QR/amwaj1.jpeg" },
+        caption: `📍 QR أمواج
+        
+Instapay or Vodafone Cash قبل الدخول:
+900 جنيه للفرد
 
-600 جنيه للفرد
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
 
-يشمل دخول البحر واللاجون`
-        });
-
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
 
         return;
     }
@@ -847,96 +1918,145 @@ if (state.step === "qr_ar") {
     // سيشيل
     else if (clean === "4") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 سعر QR سيشيل:
+    await sock.sendMessage(user, {
+        image: { url: "QR/seashell2.jpeg" },
+        caption: `📍 QR سيشيل
 
+Instapay or Vodafone Cash قبل الدخول:
 1500 جنيه للفرد
 
-يشمل دخول البحر واللاجون`
-        });
+دفع عند الوصول:
+1900 جنيه للفرد
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
 
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
-
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
         return;
     }
 
     // هاسيندا باي
     else if (clean === "5") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 سعر QR هاسيندا باي:
+    await sock.sendMessage(user, {
+        image: { url: "QR/haceindabay1.jpeg" },
+        caption: `📍 QR هاسيندا باي
 
-800 جنيه للفرد
+Instapay or Vodafone Cash قبل الدخول:
+700 جنيه للفرد
 
-يشمل دخول البحر واللاجون`
-        });
+دفع عند الوصول:
+900 جنيه للفرد
 
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
 
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
         return;
     }
 
     // هاسيندا وايت
     else if (clean === "6") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 سعر QR هاسيندا وايت:
+    await sock.sendMessage(user, {
+        image: { url: "QR/haceindawhite1.jpeg" },
+        caption: `📍 QR هاسيندا وايت
 
-900 جنيه للفرد
+Instapay or Vodafone Cash قبل الدخول:
+1500 جنيه للفرد
 
-يشمل دخول البحر واللاجون`
-        });
+دفع عند الوصول:
+1900 جنيه للفرد
 
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+يشمل:
+🏖️ البحر
+🏝️ اللاجون
+🏊 البول`
+    });
 
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
         return;
     }
 
     // ماونتن فيو
     else if (clean === "7") {
 
-        await sock.sendMessage(user, {
-            text:
-`📍 ماونتن ڤيو رأس الحكمة
+    await sock.sendMessage(user, {
+        image: { url: "QR/mv1.jpeg" },
+        caption: `📍 QR ماونتن فيو رأس الحكمة
 
-غير متاح حالياً`
-        });
+Instapay or Vodafone Cash قبل الدخول:
+700 جنيه للعربيه 🚗
 
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
+دفع عند الوصول:
+1000 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
 
         return;
+    }
+
+
+    // تلال
+    else if (clean === "8") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/telal.jpeg" },
+        caption: `📍 QR تلال
+
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للفرد
+
+دفع عند الوصول:
+1000 جنيه للفرد
+
+يشمل:
+🏖️ البحر
+🏊 البول`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+        return;
+    }
+
+    // Payment
+    else if (clean === "9") {
+    await handlePayment(user, userNumber, sock);
+    return;
     }
 
     // رجوع
     else if (clean === "0") {
 
-        state.step = "main_ar";
-
-        await sock.sendMessage(user, {
-            text:
-`📋 القائمة الرئيسية
-
-1️⃣ اسعار QR
-2️⃣ الجيتسكي واليخوت
-3️⃣ الشاليهات والفيلات
-4️⃣ الفنادق
-5️⃣ المطاعم
-6️⃣ إيجار السيارات
-7️⃣ توصيل من والي مطار العلمين
-8️⃣ السياسات والشروط`
-        });
-
+        state.step = "main_menu";
+        await sendMainMenu(user, sock);
         return;
     }
 
@@ -952,7 +2072,11 @@ if (state.step === "qr_ar") {
 4️⃣ سيشيل
 5️⃣ هاسيندا باي
 6️⃣ هاسيندا وايت
-7️⃣ ماونتن ڤيو رأس الحكمة
+7️⃣ ماونتن ڤيو
+8️⃣ تلال
+
+
+9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
 0️⃣ رجوع`
         });
 
@@ -960,127 +2084,47 @@ if (state.step === "qr_ar") {
     }
 }
 
+
+
+
+
+
 // =========================
-// JETSKI MENU ARABIC
+// BEACH MENU 
 // =========================
 
-if (state.step === "jetski_ar") {
+if (state.step === "beach") {
 
-    // جيتسكي مارينا
+    // KARL
     if (clean === "1") {
-
-        await sock.sendMessage(user, {
-            text:
-`15 دقيقة = 1500 جنيه
-30 دقيقة = 2500 جنيه
-60 دقيقة = 5000 جنيه
-
-السعر يشمل دخول مارينا`
-        });
-
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
-
+        await sendkarl(user, sock);
         return;
     }
 
-    // يخت مارينا
+
     else if (clean === "2") {
-
-        await sock.sendMessage(user, {
-            text: "🛥️ خدمة اليخوت قريباً"
-        });
-
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
-
+        await sendnoya(user, sock);
         return;
     }
 
-    // جيتسكي مراسي
-    else if (clean === "3") {
-
-        await sock.sendMessage(user, {
-            text:
-`🛥️ جيتسكي مراسي في صافي بيتش
-
-💰 10000 جنيه للساعة
-
-يشمل دخول صافي بيتش طوال اليوم`
-        });
-
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
-
-        return;
-    }
-
-    // يخت مراسي
-    else if (clean === "4") {
-
-        await sock.sendMessage(user, {
-            text: "🛥️ خدمة اليخوت قريباً"
-        });
-
-        await sock.sendMessage(user, {
-            text: "0️⃣ القائمه الرئيسيه"
-        });
-
-        return;
+    // Payment
+    else if (clean === "9") {
+    await handlePayment(user, userNumber, sock);
+    return;
     }
 
     // رجوع
     else if (clean === "0") {
 
-        state.step = "main_ar";
-
-        await sock.sendMessage(user, {
-            text:
-`📋 القائمة الرئيسية
-
-1️⃣ اسعار QR
-2️⃣ الجيتسكي واليخوت
-3️⃣ الشاليهات والفيلات
-4️⃣ الفنادق
-5️⃣ المطاعم
-6️⃣ إيجار السيارات
-7️⃣ توصيل من والي مطار العلمين
-8️⃣ السياسات والشروط`
-        });
-
-        return;
-    }
-
-    else {
-
-        await sock.sendMessage(user, {
-            text:
-`🛥️ الجيتسكي واليخوت
-
-1️⃣ جيتسكي مارينا
-2️⃣ يخت مارينا
-3️⃣ جيتسكي مراسي
-4️⃣ يخت مراسي
-0️⃣ رجوع`
-        });
-
+        state.step = "main_menu";
+        await sendMainMenu(user, sock);
         return;
     }
 }
    
 
-//send no
-
-
-
-
-
-
     });
 
-
+}
 
 startBot();
