@@ -1032,11 +1032,8 @@ if (intent === "marina") {
         image: { url: "QR/marina.jpg" },
         caption: `📍 QR مارينا
 
-Instapay or Vodafone Cash قبل الدخول:
-🚗 250 جنيه للعربية
-
-دفع عند الوصول:
-🚗 400 جنيه للعربية`
+Instapay or Vodafone Cash:
+🚗 250 جنيه للعربية`
     });
 
     await sock.sendMessage(user, {
@@ -1058,7 +1055,7 @@ if (intent === "marassi") {
 
 Instapay or Vodafone Cash قبل الدخول:
 1000 جنيه للعربية 🚗
-
+أو
 دفع عند الوصول:
 1400 جنيه للعربيه 🚗`
     });
@@ -1069,7 +1066,7 @@ Instapay or Vodafone Cash قبل الدخول:
 
 Instapay or Vodafone Cash قبل الدخول:
 1200 جنيه للفرد
-
+أو
 دفع عند الوصول:
 1500 جنيه للفرد
 
@@ -1084,7 +1081,7 @@ note:
 
 Instapay or Vodafone Cash قبل الدخول:
 2500 جنيه للعربيه 🚗
-
+أو
 دفع عند الوصول:
 3000 جنيه للعربيه 🚗
 
@@ -1098,7 +1095,7 @@ note:
 
 Instapay or Vodafone Cash قبل الدخول:
 600 جنيه للفرد
-
+أو
 دفع عند الوصول:
 800 جنيه للفرد
 
@@ -1112,10 +1109,10 @@ note:
         caption: ` كلوب هاوس بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-2500 جنيه للفرد
-
-دفع عند الوصول:
 3500 جنيه للفرد
+أو
+دفع عند الوصول:
+4000 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1127,10 +1124,10 @@ note:
         caption: ` صافي بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-4500 جنيه للفرد
-
-دفع عند الوصول:
 5000 جنيه للفرد
+أو
+دفع عند الوصول:
+5500 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1141,10 +1138,10 @@ note:
         caption: ` مراسي واتر وورلد 🏝️:
 
 تذكره لشخص بالغ:
-2500 جنيه
-
+2200 جنيه
+أو
 تذكره لطفل أقصر من 120 سم:
-2000 جنيه
+1800 جنيه
 
 note:
 السعر يشمل qr البوابه الخارجيه
@@ -1156,7 +1153,8 @@ note:
         image: { url: "QR/Marassi/hub.jpeg" },
         caption: `THE HUB MARASSI
 
-غير متاح حاليا`
+Instapay or Vodafone Cash قبل الدخول:
+800 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1200,10 +1198,10 @@ if (intent === "seashell") {
         caption: `📍 QR سيشيل
 
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للفرد
-
+1700 جنيه للفرد
+أو
 دفع عند الوصول:
-1900 جنيه للفرد
+2000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1227,8 +1225,8 @@ if (intent === "hacienda_bay") {
         caption: `📍 QR هاسيندا باي
 
 Instapay or Vodafone Cash قبل الدخول:
-700 جنيه للفرد
-
+750 جنيه للفرد
+أو
 دفع عند الوصول:
 900 جنيه للفرد
 
@@ -1254,10 +1252,10 @@ if (intent === "hacienda_white") {
         caption: `📍 QR هاسيندا وايت
 
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للفرد
-
+1700 جنيه للفرد
+أو
 دفع عند الوصول:
-1900 جنيه للفرد
+2000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1282,10 +1280,10 @@ if (intent === "hacienda_red") {
         caption: `📍 QR هاسيندا ريد
 
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للفرد
-
+1700 جنيه للفرد
+أو
 دفع عند الوصول:
-1900 جنيه للفرد
+2000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1310,10 +1308,10 @@ if (intent === "telal") {
         caption: `📍 QR تلال
 
 Instapay or Vodafone Cash قبل الدخول:
-800 جنيه للفرد
-
+900 جنيه للفرد
+أو
 دفع عند الوصول:
-1000 جنيه للفرد
+1100 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1336,10 +1334,10 @@ if (intent === "mountain_view") {
         caption: `📍 QR ماونتن فيو رأس الحكمة
 
 Instapay or Vodafone Cash قبل الدخول:
-700 جنيه للعربيه 🚗
-
+900 جنيه للعربيه 🚗
+أو
 دفع عند الوصول:
-1000 جنيه للعربيه 🚗`
+1100 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1351,32 +1349,6 @@ Instapay or Vodafone Cash قبل الدخول:
     return;
 }
 
-
-if (intent === "telal") {
-
-    await sock.sendMessage(user, {
-        image: { url: "QR/telal.jpeg" },
-        caption: `📍 QR تلال
-
-Instapay or Vodafone Cash قبل الدخول:
-800 جنيه للفرد
-
-دفع عند الوصول:
-1000 جنيه للفرد
-
-يشمل:
-🏖️ البحر
-🏊 البول`
-    });
-
-    await sock.sendMessage(user, {
-        text:
-`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
-0️⃣ القائمة الرئيسية كامله`
-    });
-
-    return;
-}
 
 
 if (intent === "payment") {
@@ -1786,9 +1758,9 @@ if (state.step === "qr") {
 
 Instapay or Vodafone Cash قبل الدخول:
 🚗 250 جنيه للعربية
-
+أو
 دفع عند الوصول:
-🚗 400 جنيه للعربية`
+🚗 350 جنيه للعربية`
     });
 
     await sock.sendMessage(user, {
@@ -1809,18 +1781,18 @@ Instapay or Vodafone Cash قبل الدخول:
 
 Instapay or Vodafone Cash قبل الدخول:
 1000 جنيه للعربية 🚗
-
+أو
 دفع عند الوصول:
 1400 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
         image: { url: "QR/Marassi/north1.jpeg" },
-        caption: `• نورث بيتش 🏖️:
+        caption: `نورث بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
 1200 جنيه للفرد
-
+أو
 دفع عند الوصول:
 1500 جنيه للفرد
 
@@ -1831,11 +1803,11 @@ note:
 
     await sock.sendMessage(user, {
         image: { url: "QR/Marassi/blancalagoon.jpeg" },
-        caption: `• مراسي بلانكا 🏝️:
+        caption: `مراسي بلانكا 🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
 2500 جنيه للعربيه 🚗
-
+أو
 دفع عند الوصول:
 3000 جنيه للعربيه 🚗
 
@@ -1849,7 +1821,7 @@ note:
 
 Instapay or Vodafone Cash قبل الدخول:
 600 جنيه للفرد
-
+أو
 دفع عند الوصول:
 800 جنيه للفرد
 
@@ -1862,10 +1834,10 @@ note:
         caption: ` مراسي واتر وورلد 🏝️:
 
 تذكره لشخص بالغ:
-2500 جنيه
-
+2200 جنيه
+أو
 تذكره لطفل أقصر من 120 سم:
-2000 جنيه
+1800 جنيه
 
 note:
 السعر يشمل qr البوابه الخارجيه
@@ -1923,10 +1895,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR سيشيل
 
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للفرد
-
+1700 جنيه للفرد
+أو
 دفع عند الوصول:
-1900 جنيه للفرد
+2000 جنيه للفرد
 يشمل:
 🏖️ البحر
 🏝️ اللاجون
@@ -1949,8 +1921,8 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR هاسيندا باي
 
 Instapay or Vodafone Cash قبل الدخول:
-700 جنيه للفرد
-
+750 جنيه للفرد
+أو
 دفع عند الوصول:
 900 جنيه للفرد
 
@@ -1976,10 +1948,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR هاسيندا وايت
 
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للفرد
-
+1700 جنيه للفرد
+أو
 دفع عند الوصول:
-1900 جنيه للفرد
+2000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -2003,10 +1975,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR ماونتن فيو رأس الحكمة
 
 Instapay or Vodafone Cash قبل الدخول:
-700 جنيه للعربيه 🚗
-
+900 جنيه للعربيه 🚗
+أو
 دفع عند الوصول:
-1000 جنيه للعربيه 🚗`
+1100 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -2027,10 +1999,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR تلال
 
 Instapay or Vodafone Cash قبل الدخول:
-800 جنيه للفرد
-
+900 جنيه للفرد
+أو
 دفع عند الوصول:
-1000 جنيه للفرد
+1100 للفرد
 
 يشمل:
 🏖️ البحر
