@@ -46,6 +46,18 @@ function detectIntent(text = "") {
         return "marina";
     }
 
+    
+    // =====================
+    // LAVISTA
+    // =====================
+
+    if (
+        text.includes("لافيستا") ||
+        text.includes("lavista") ||
+        text.includes("لافستا") 
+    ) {
+        return "lavista";
+    }
 
     // =====================
     // Telal

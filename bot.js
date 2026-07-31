@@ -1050,14 +1050,14 @@ if (intent === "marassi") {
 
 
     await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/marina1.jpeg" },
+        image: { url: "QR/last/last last/marassi.jpeg" },
         caption: `مراسي مارينا ✨:
 
 Instapay or Vodafone Cash قبل الدخول:
-1000 جنيه للعربية 🚗
+1300 جنيه للعربية 🚗
 أو
 دفع عند الوصول:
-1400 جنيه للعربيه 🚗`
+1500 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1065,10 +1065,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `نورث بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-1200 جنيه للفرد
+1500 جنيه للفرد
 أو
 دفع عند الوصول:
-1500 جنيه للفرد
+1700 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1080,17 +1080,17 @@ note:
         caption: `مراسي بلانكا 🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
-2500 جنيه للعربيه 🚗
+3000 جنيه للعربيه 🚗
 أو
 دفع عند الوصول:
-3000 جنيه للعربيه 🚗
+3500 جنيه للعربيه 🚗
 
 note:
 لا يشمل qr البوابه الخارجيه`
     });
 
     await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/marinalagoon.jpg" },
+        image: { url: "QR/last/last last/pool.jpeg" },
         caption: `حمامات سباحه المارينا  🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
@@ -1105,7 +1105,7 @@ note:
 
 
     await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/ClubHouse.jpeg" },
+        image: { url: "QR/Marassi/ClubHouse1.jpeg" },
         caption: ` كلوب هاوس بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
@@ -1124,38 +1124,15 @@ note:
         caption: ` صافي بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-5000 جنيه للفرد
+5500 جنيه للفرد
 أو
 دفع عند الوصول:
-5500 جنيه للفرد
+6000 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
     });
-
-    await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/waterworld.jpeg" },
-        caption: ` مراسي واتر وورلد 🏝️:
-
-تذكره لشخص بالغ:
-2200 جنيه
-أو
-تذكره لطفل أقصر من 120 سم:
-1800 جنيه
-
-note:
-السعر يشمل qr البوابه الخارجيه
-الأطفال أطول من 120 سم يتم احتسابهم بالغين`
-    });    
     
-
-    await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/hub.jpeg" },
-        caption: `THE HUB MARASSI
-
-Instapay or Vodafone Cash قبل الدخول:
-800 جنيه للعربيه 🚗`
-    });
 
     await sock.sendMessage(user, {
         text:
@@ -1198,7 +1175,7 @@ if (intent === "seashell") {
         caption: `📍 QR سيشيل
 
 Instapay or Vodafone Cash قبل الدخول:
-1700 جنيه للفرد
+1800 جنيه للفرد
 أو
 دفع عند الوصول:
 2000 جنيه للفرد
@@ -1225,10 +1202,10 @@ if (intent === "hacienda_bay") {
         caption: `📍 QR هاسيندا باي
 
 Instapay or Vodafone Cash قبل الدخول:
-750 جنيه للفرد
+900 جنيه للفرد
 أو
 دفع عند الوصول:
-900 جنيه للفرد
+1000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1252,7 +1229,7 @@ if (intent === "hacienda_white") {
         caption: `📍 QR هاسيندا وايت
 
 Instapay or Vodafone Cash قبل الدخول:
-1700 جنيه للفرد
+1800 جنيه للفرد
 أو
 دفع عند الوصول:
 2000 جنيه للفرد
@@ -1280,7 +1257,7 @@ if (intent === "hacienda_red") {
         caption: `📍 QR هاسيندا ريد
 
 Instapay or Vodafone Cash قبل الدخول:
-1700 جنيه للفرد
+1800 جنيه للفرد
 أو
 دفع عند الوصول:
 2000 جنيه للفرد
@@ -1311,7 +1288,7 @@ Instapay or Vodafone Cash قبل الدخول:
 900 جنيه للفرد
 أو
 دفع عند الوصول:
-1100 جنيه للفرد
+1000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1334,10 +1311,38 @@ if (intent === "mountain_view") {
         caption: `📍 QR ماونتن فيو رأس الحكمة
 
 Instapay or Vodafone Cash قبل الدخول:
-900 جنيه للعربيه 🚗
+1000 جنيه للعربيه 🚗
 أو
 دفع عند الوصول:
-1100 جنيه للعربيه 🚗`
+1200 جنيه للعربيه 🚗`
+    });
+
+    await sock.sendMessage(user, {
+        text:
+`9️⃣ للحجز وتحويل المحادثه لخدمة العملاء
+0️⃣ القائمة الرئيسية كامله`
+    });
+
+    return;
+}
+
+if (intent === "lavista") {
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/lavista2.jpeg" },
+        caption: `📍 QR لافيستا باي
+
+Instapay or Vodafone Cash قبل الدخول:
+2000 جنيه للعربيه 🚗
+أو
+دفع عند الوصول:
+2500 جنيه للعربيه 🚗
+
+يشمل:
+🏝️ البوابة
+🏖️ البحر
+🏊 البول`
+
     });
 
     await sock.sendMessage(user, {
@@ -1756,11 +1761,8 @@ if (state.step === "qr") {
         image: { url: "QR/marina.jpg" },
         caption: `📍 QR مارينا
 
-Instapay or Vodafone Cash قبل الدخول:
-🚗 250 جنيه للعربية
-أو
-دفع عند الوصول:
-🚗 350 جنيه للعربية`
+Instapay or Vodafone Cash:
+🚗 250 جنيه للعربية`
     });
 
     await sock.sendMessage(user, {
@@ -1775,15 +1777,18 @@ Instapay or Vodafone Cash قبل الدخول:
     else if (clean === "2") {
 
 
+
+
+
     await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/marina1.jpeg" },
+        image: { url: "QR/last/last last/marassi.jpeg" },
         caption: `مراسي مارينا ✨:
 
 Instapay or Vodafone Cash قبل الدخول:
-1000 جنيه للعربية 🚗
+1300 جنيه للعربية 🚗
 أو
 دفع عند الوصول:
-1400 جنيه للعربيه 🚗`
+1500 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1791,10 +1796,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `نورث بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-1200 جنيه للفرد
+1500 جنيه للفرد
 أو
 دفع عند الوصول:
-1500 جنيه للفرد
+1700 جنيه للفرد
 
 note:
 لا يشمل qr البوابه الخارجيه`
@@ -1806,17 +1811,17 @@ note:
         caption: `مراسي بلانكا 🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
-2500 جنيه للعربيه 🚗
+3000 جنيه للعربيه 🚗
 أو
 دفع عند الوصول:
-3000 جنيه للعربيه 🚗
+3500 جنيه للعربيه 🚗
 
 note:
 لا يشمل qr البوابه الخارجيه`
     });
 
     await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/marinalagoon.jpg" },
+        image: { url: "QR/last/last last/pool.jpeg" },
         caption: `حمامات سباحه المارينا  🏝️:
 
 Instapay or Vodafone Cash قبل الدخول:
@@ -1829,29 +1834,36 @@ note:
 لا يشمل qr البوابه الخارجيه`
     });
 
-    await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/waterworld.jpeg" },
-        caption: ` مراسي واتر وورلد 🏝️:
-
-تذكره لشخص بالغ:
-2200 جنيه
-أو
-تذكره لطفل أقصر من 120 سم:
-1800 جنيه
-
-note:
-السعر يشمل qr البوابه الخارجيه
-الأطفال أطول من 120 سم يتم احتسابهم بالغين`
-    });    
-    
 
     await sock.sendMessage(user, {
-        image: { url: "QR/Marassi/hub.jpeg" },
-        caption: `THE HUB MARASSI
+        image: { url: "QR/Marassi/ClubHouse1.jpeg" },
+        caption: ` كلوب هاوس بيتش 🏖️:
 
 Instapay or Vodafone Cash قبل الدخول:
-800 جنيه للعربيه 🚗`
+3500 جنيه للفرد
+أو
+دفع عند الوصول:
+4000 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
     });
+
+
+    await sock.sendMessage(user, {
+        image: { url: "QR/Marassi/Safi.jpeg" },
+        caption: ` صافي بيتش 🏖️:
+
+Instapay or Vodafone Cash قبل الدخول:
+5500 جنيه للفرد
+أو
+دفع عند الوصول:
+6000 جنيه للفرد
+
+note:
+لا يشمل qr البوابه الخارجيه`
+    });
+    
 
     await sock.sendMessage(user, {
         text:
@@ -1859,7 +1871,7 @@ Instapay or Vodafone Cash قبل الدخول:
 0️⃣ القائمة الرئيسية كامله`
     });
 
-        return;
+    return;
     }
 
     // أمواج
@@ -1895,7 +1907,7 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR سيشيل
 
 Instapay or Vodafone Cash قبل الدخول:
-1700 جنيه للفرد
+1800 جنيه للفرد
 أو
 دفع عند الوصول:
 2000 جنيه للفرد
@@ -1921,10 +1933,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR هاسيندا باي
 
 Instapay or Vodafone Cash قبل الدخول:
-750 جنيه للفرد
+900 جنيه للفرد
 أو
 دفع عند الوصول:
-900 جنيه للفرد
+1000 جنيه للفرد
 
 يشمل:
 🏖️ البحر
@@ -1948,7 +1960,7 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR هاسيندا وايت
 
 Instapay or Vodafone Cash قبل الدخول:
-1700 جنيه للفرد
+1800 جنيه للفرد
 أو
 دفع عند الوصول:
 2000 جنيه للفرد
@@ -1975,10 +1987,10 @@ Instapay or Vodafone Cash قبل الدخول:
         caption: `📍 QR ماونتن فيو رأس الحكمة
 
 Instapay or Vodafone Cash قبل الدخول:
-900 جنيه للعربيه 🚗
+1000 جنيه للعربيه 🚗
 أو
 دفع عند الوصول:
-1100 جنيه للعربيه 🚗`
+1200 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -2002,7 +2014,7 @@ Instapay or Vodafone Cash قبل الدخول:
 900 جنيه للفرد
 أو
 دفع عند الوصول:
-1100 للفرد
+1000 للفرد
 
 يشمل:
 🏖️ البحر
