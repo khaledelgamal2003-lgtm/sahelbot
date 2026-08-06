@@ -1053,11 +1053,12 @@ if (intent === "marassi") {
         image: { url: "QR/last/last last/marassi.jpeg" },
         caption: `مراسي مارينا ✨:
 
+*سعر الويكند*
 Instapay or Vodafone Cash قبل الدخول:
-1300 جنيه للعربية 🚗
+1500 جنيه للعربية 🚗
 أو
 دفع عند الوصول:
-1500 جنيه للعربيه 🚗`
+1800 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
@@ -1784,11 +1785,12 @@ Instapay or Vodafone Cash:
         image: { url: "QR/last/last last/marassi.jpeg" },
         caption: `مراسي مارينا ✨:
 
+*سعر الويكند*
 Instapay or Vodafone Cash قبل الدخول:
-1300 جنيه للعربية 🚗
+1500 جنيه للعربية 🚗
 أو
 دفع عند الوصول:
-1500 جنيه للعربيه 🚗`
+1800 جنيه للعربيه 🚗`
     });
 
     await sock.sendMessage(user, {
