@@ -613,7 +613,7 @@ async function sendBobos(user, sock) {
 
     await sock.sendMessage(user, {
         text:
-`اليخوت والجيتسكي غير متاحه للحجز حتي 30/7/2026
+`اليخوت والجيتسكي غير متاحه للحجز حتي 15/8/2026
 نعمل علي توفيرها في أقرب وقت`
     });    
 
@@ -1053,12 +1053,12 @@ if (intent === "marassi") {
         image: { url: "QR/last/last last/marassi.jpeg" },
         caption: `مراسي مارينا ✨:
 
-*سعر الويكند*
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للعربية 🚗
+1300 جنيه للعربية 🚗
 أو
 دفع عند الوصول:
-1800 جنيه للعربيه 🚗`
+1500 جنيه للعربيه 🚗
+*+200 EGP في الويكند*`
     });
 
     await sock.sendMessage(user, {
@@ -1785,12 +1785,13 @@ Instapay or Vodafone Cash:
         image: { url: "QR/last/last last/marassi.jpeg" },
         caption: `مراسي مارينا ✨:
 
-*سعر الويكند*
+
 Instapay or Vodafone Cash قبل الدخول:
-1500 جنيه للعربية 🚗
+1300 جنيه للعربية 🚗
 أو
 دفع عند الوصول:
-1800 جنيه للعربيه 🚗`
+1500 جنيه للعربيه 🚗
+*+200 EGP في الويكند*`
     });
 
     await sock.sendMessage(user, {
